@@ -35,3 +35,7 @@ Thumbs.db
 
 # ìž„ì‹œ
 *.log
+
+# ÀÓ½Ã worker ¸ðµâ
+*.module.cjs
+wm.cjs
