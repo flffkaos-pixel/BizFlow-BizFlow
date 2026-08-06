@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BizFlow - 결제</title>
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD&intent=capture"></script>
+<style>
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #0F172A; color: #E2E8F0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; }
+  .card { background: #1E293B; border-radius: 16px; padding: 40px; max-width: 420px; width: 100%; }
+  h1 { font-size: 24px; margin: 0 0 8px; }
+  p.sub { color: #94A3B8; font-size: 14px; margin: 0 0 24px; }
+  .plan { border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px; cursor: pointer; transition: all 200ms; }
+  .plan.selected { border-color: #3B82F6; background: #1D4ED8; }
+  .plan h3 { margin: 0 0 4px; font-size: 16px; }
+  .plan .price { font-size: 20px; font-weight: 700; color: #F59E0B; }
+  .plan .desc { color: #94A3B8; font-size: 12px; }
+  #paypal-button-container { margin-top: 16px; }
+  #paypal-button-container:empty::after { content: 'PayPal 로딩 중...'; color: #94A3B8; font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>BizFlow 구독 결제</h1>
+    <p class="sub">원하는 요금제를 선택하고 PayPal로 결제하세요. 결제 완료 후 자동으로 계정이 활성화됩니다.</p>
+
+    <div class="plan selected" data-plan="starter" data-amount="49.00">
+      <h3>스타터</h3>
+      <div class="price">$49 / 월</div>
+      <div class="desc">월 1,000건 카톡 응대 · 기본 리포트</div>
+    </div>
+    <div class="plan" data-plan="pro" data-amount="149.00">
+      <h3>프로</h3>
+      <div class="price">$149 / 월</div>
+      <div class="desc">무제한 응대 · 고급 분석 · 우선 지원</div>
+    </div>
+
+    <div id="paypal-button-container"></div>
+    <p style="font-size:12px;color:#64748B;margin-top:16px;text-align:center;">
+      결제 시 BizFlow 이용약관과 개인정보 처리방침에 동의하는 것으로 간주됩니다.
+    </p>
+  </div>
+
+<script>
+  let selectedPlan = { name: 'starter', amount: '49.00' };
+
+  document.querySelectorAll('.plan').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.plan').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedPlan = { name: el.dataset.plan, amount: el.dataset.amount };
+    });
+  });
+
+  paypal.Buttons({
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        intent: 'CAPTURE',
+        purchase_units: [{
+          reference_id: selectedPlan.name,
+          description: 'BizFlow 구독',
+          amount: { currency_code: 'USD', value: selectedPlan.amount }
+        }]
+      });
+    },
+    onApprove: async (data, actions) => {
+      const details = await actions.order.capture();
+      alert('결제 완료! ' + details.payer.name.given_name + '님 환영합니다.');
+      // 결제 완료 이메일을 GitHub Actions에서 감지할 수 있도록 기록
+      console.log('ORDER_ID:', data.orderID);
+    },
+    onError: (err) => { alert('결제 중 오류가 발생했습니다. 다시 시도해주세요.'); }
+  }).render('#paypal-button-container');
+</script>
+</body>
+</html>

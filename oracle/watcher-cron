@@ -1,0 +1,8 @@
+# Watcher 크롤러 cron (컨테이너 내부)
+# 분 시 일 월 요일  명령어
+
+# 매일 06:00 크롤링 실행
+0 6 * * *  python /app/scripts/run_monitor.py >> /var/log/watcher.log 2>&1
+
+# 매월 1일 09:00 리포트 생성
+0 9 1 * *  python /app/scripts/generate_report.py >> /var/log/watcher.log 2>&1

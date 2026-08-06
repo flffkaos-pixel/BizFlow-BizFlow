@@ -1,0 +1,31 @@
+{
+  "customers": {
+    "홍길동": {
+      "email": "hong@example.com",
+      "competitors": [
+        "https://example-competitor-a.com",
+        "https://example-competitor-b.com"
+      ],
+      "plan": "pro",
+      "active": true
+    },
+    "김철수": {
+      "email": "kim@example.com",
+      "competitors": [
+        "https://example-competitor-c.com"
+      ],
+      "plan": "starter",
+      "active": true
+    }
+  },
+  "default_competitors": [
+    "https://example-competitor-a.com",
+    "https://example-competitor-b.com"
+  ],
+  "crawl_settings": {
+    "user_agent": "CompWatchBot/1.0 (+https://yourdomain.com)",
+    "timeout_seconds": 30,
+    "max_pages_per_site": 3,
+    "retry_count": 2
+  }
+}

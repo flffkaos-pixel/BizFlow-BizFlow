@@ -1,0 +1,109 @@
+{
+  "name": "카카오톡 규격 변환 (Inbound)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "webhook-kakao",
+      "name": "카카오 챗봇 Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "kakao-official",
+      "parameters": {
+        "path": "kakao-official",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 카카오 i 오픈빌더 / 채널 챗봇 요청 포맷을 n8n 내부 포맷으로 변환\n// 카카오 요청 구조 (skillPayload):\n// { userRequest: { utterance, user: { id, ... } }, bot: { id }, ... }\n\nconst payload = $json.body || $json;\nconst userReq = payload.userRequest || {};\nconst user = userReq.user || {};\n\nreturn [{\n  json: {\n    // n8n 내부 워크플로우(kakao-booking.json)가 이해하는 필드\n    message: userReq.utterance || '',\n    sender: user.id || userReq.userId || 'unknown',\n    userKey: user.id || '',\n    raw: payload\n  }\n}];",
+        "options": {}
+      },
+      "id": "code-convert-in",
+      "name": "카카오 → 내부 변환",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "http-post-n8n",
+      "name": "n8n 처리 워크플로우로 전달",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300],
+      "parameters": {
+        "url": "={{ $env.N8N_INTERNAL_URL }}",
+        "authentication": "none",
+        "sendBody": true,
+        "options": {
+          "body": "={{ $json }}",
+          "method": "POST"
+        },
+        "bodyParameters": {}
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 내부 응답을 카카오 응답 포맷으로 변환\n// 카카오 i 오픈빌더 템플릿: simpleText\n\nconst result = $json.json || $json;\nconst message = result.message || '처리되었습니다.';\n\nreturn [{\n  json: {\n    version: '2.0',\n    template: {\n      outputs: [\n        {\n          simpleText: {\n            text: message\n          }\n        }\n      ]\n    }\n  }\n}];",
+        "options": {}
+      },
+      "id": "code-convert-out",
+      "name": "내부 → 카카오 변환",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 480]
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json; charset=utf-8" }
+            ]
+          }
+        },
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond-kakao",
+      "name": "카카오 규격 응답",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [720, 480]
+    }
+  ],
+  "connections": {
+    "webhook-kakao": {
+      "main": [
+        [{ "node": "code-convert-in", "type": "main", "index": 0 }]
+      ]
+    },
+    "code-convert-in": {
+      "main": [
+        [{ "node": "http-post-n8n", "type": "main", "index": 0 }]
+      ]
+    },
+    "http-post-n8n": {
+      "main": [
+        [{ "node": "code-convert-out", "type": "main", "index": 0 }]
+      ]
+    },
+    "code-convert-out": {
+      "main": [
+        [{ "node": "respond-kakao", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

@@ -1,0 +1,5 @@
+[
+  { "url": "https://example.com", "grade": "A" },
+  { "url": "https://example.org/pricing", "grade": "B" },
+  { "url": "https://example.net", "grade": "C" }
+]

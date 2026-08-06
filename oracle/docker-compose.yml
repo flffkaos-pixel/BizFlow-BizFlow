@@ -1,0 +1,192 @@
+# Oracle Cloud 상시 서버용 통합 배포
+# BizFlow (n8n + Dify + Cal.com) + CompWatch (크롤러 스케줄러) + Cloudflare Tunnel
+
+version: "3.9"
+
+services:
+  # ── PostgreSQL (공유 DB) ──────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: oracle-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_strong_password}
+      POSTGRES_DB: appdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ─────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: oracle-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-change_me_redis}
+    volumes:
+      - redisdata:/data
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-change_me_redis}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ── n8n (워크플로우 자동화) ────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: oracle-n8n
+    restart: unless-stopped
+    environment:
+      N8N_HOST: ${PUBLIC_DOMAIN:-n8n.example.com}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: https
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD:-change_me_n8n}
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: appdb
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-app_admin}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:-change_me_strong_password}
+      EXECUTIONS_DATA_PRUNE: "true"
+      EXECUTIONS_DATA_MAX_AGE: 168
+    volumes:
+      - n8ndata:/home/node/.n8n
+    networks:
+      - app-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ── Dify (AI 챗봇 - BizFlow) ──────────────────────────
+  dify-api:
+    image: langgenius/dify-api:latest
+    container_name: oracle-dify-api
+    restart: unless-stopped
+    environment:
+      MODE: api
+      SECRET_KEY: ${DIFY_SECRET_KEY:-change_me_dify_32chars}
+      DB_USERNAME: ${POSTGRES_USER:-app_admin}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-change_me_strong_password}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: appdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-change_me_redis}
+      STORAGE_TYPE: local
+    volumes:
+      - difystorage:/app/api/storage
+    networks:
+      - app-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  dify-worker:
+    image: langgenius/dify-api:latest
+    container_name: oracle-dify-worker
+    restart: unless-stopped
+    environment:
+      MODE: worker
+      SECRET_KEY: ${DIFY_SECRET_KEY:-change_me_dify_32chars}
+      DB_USERNAME: ${POSTGRES_USER:-app_admin}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-change_me_strong_password}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: appdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-change_me_redis}
+      STORAGE_TYPE: local
+    volumes:
+      - difystorage:/app/api/storage
+    networks:
+      - app-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  dify-web:
+    image: langgenius/dify-web:latest
+    container_name: oracle-dify-web
+    restart: unless-stopped
+    environment:
+      CONSOLE_API_URL: https://${PUBLIC_DOMAIN:-dify.example.com}/api
+      APP_API_URL: https://${PUBLIC_DOMAIN:-dify.example.com}/v1
+    networks:
+      - app-net
+    depends_on:
+      - dify-api
+
+  # ── Cal.com (예약 - BizFlow) ──────────────────────────
+  calcom:
+    image: calcom/cal.com:latest
+    container_name: oracle-calcom
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app_admin}:${POSTGRES_PASSWORD:-change_me_strong_password}@postgres:5432/appdb
+      NEXTAUTH_URL: https://${PUBLIC_DOMAIN:-cal.example.com}
+      NEXTAUTH_SECRET: ${CAL_SECRET:-change_me_cal_32chars}
+      CALENDSO_ENCRYPTION_KEY: ${CAL_ENCRYPTION_KEY:-change_me_cal_enc_32chars}
+      NEXT_PUBLIC_WEBAPP_URL: https://${PUBLIC_DOMAIN:-cal.example.com}
+    networks:
+      - app-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── CompWatch 크롤러 스케줄러 (내부 cron) ─────────────
+  watcher:
+    image: python:3.11-slim
+    container_name: oracle-watcher
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ../scripts:/app/scripts:ro
+      - ../config:/app/config:ro
+      - ../snapshots:/app/snapshots
+      - ./watcher-cron:/etc/cron.d/watcher-cron:ro
+    command: >
+      sh -c "pip install requests beautifulsoup4 && 
+             apt-get update && apt-get install -y cron &&
+             crontab /etc/cron.d/watcher-cron &&
+             cron -f"
+    networks:
+      - app-net
+    depends_on:
+      - postgres
+
+  # ── Cloudflare Tunnel (무료 HTTPS) ────────────────────
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: oracle-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - app-net
+
+volumes:
+  pgdata:
+  redisdata:
+  n8ndata:
+  difystorage:
+
+networks:
+  app-net:
+    driver: bridge

@@ -1,0 +1,47 @@
+{
+  "name": "예약 확정 → 텔레그램 알림",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// 카톡 확정 응답 직후 실행 (예약 데이터에서 알림 내용 구성)\n// 입력: calcom-booking 노드의 응답 또는 respond-success 직전 데이터\n\nconst booking = $json.json || $json;\nconst name = booking.name || '고객';\nconst start = booking.start || '';\nconst email = booking.email || '';\nconst notes = booking.notes || '';\n\nconst dt = new Date(start);\nconst kst = new Date(dt.getTime() + 9 * 3600 * 1000);\nconst when = isNaN(dt.getTime())\n  ? start\n  : kst.toISOString().replace('T', ' ').slice(0, 16) + ' KST';\n\nreturn [{\n  json: {\n    chatId: $env.TELEGRAM_CHAT_ID,\n    text: `📅 *신규 예약 확정*\n\n👤 고객: ${name}\n🕐 일시: ${when}\n📧 이메일: ${email}\n📝 메모: ${notes || '-'}\n\n(자동으로 생성되었습니다)`\n  }\n}];",
+        "options": {}
+      },
+      "id": "code-alert-build",
+      "name": "알림 메시지 구성",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "options": {
+          "method": "POST",
+          "body": "={{ $json }}",
+          "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage"
+        },
+        "sendBody": true,
+        "bodyParameters": {},
+        "authentication": "none"
+      },
+      "id": "http-telegram",
+      "name": "텔레그램 전송",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    }
+  ],
+  "connections": {
+    "code-alert-build": {
+      "main": [
+        [{ "node": "http-telegram", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

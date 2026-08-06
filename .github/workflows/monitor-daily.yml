@@ -1,0 +1,33 @@
+name: 경쟁사 모니터링 (일일 크롤링)
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # 매일 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 의존성 설치
+        run: |
+          pip install beautifulsoup4 requests
+          pip install git+https://github.com/D4Vinci/Scrapling.git
+
+      - name: 크롤링 실행
+        run: |
+          python scripts/run_monitor.py
+
+      - name: 변경 이력 커밋
+        run: |
+          git config user.name "monitor-bot"
+          git config user.email "actions@github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "자동: 일일 모니터링 스냅샷 $(date +%Y-%m-%d)"
+          git push

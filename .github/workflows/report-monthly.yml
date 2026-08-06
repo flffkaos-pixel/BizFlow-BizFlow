@@ -1,0 +1,29 @@
+name: 월간 리포트 생성
+
+on:
+  schedule:
+    - cron: "0 9 1 * *"   # 매월 1일 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 리포트 생성
+        run: |
+          python scripts/generate_report.py > reports/monthly_$(date +%Y-%m).md
+          cat reports/monthly_$(date +%Y-%m).md
+
+      - name: 리포트 커밋
+        run: |
+          git config user.name "report-bot"
+          git config user.email "actions@github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "자동: 월간 리포트 $(date +%Y-%m)"
+          git push

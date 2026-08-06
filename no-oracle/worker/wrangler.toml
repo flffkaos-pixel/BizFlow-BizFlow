@@ -1,0 +1,13 @@
+name = "kakao-gateway"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# Cloudflare KV 바인딩 (KV 네임스페이스 생성 후 ID 입력)
+#   wrangler kv namespace create QUEUE
+kv_namespaces = [
+  { binding = "QUEUE", id = "REPLACE_WITH_YOUR_KV_ID" }
+]
+
+# 선택: 카카오 간편봇 콜백 (실제 push) URL
+[vars]
+KAKAO_CALLBACK_URL = ""

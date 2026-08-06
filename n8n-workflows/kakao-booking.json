@@ -1,0 +1,220 @@
+{
+  "name": "Kakao AI 응대 + 예약 자동확정",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "webhook-inbound",
+      "name": "카카오톡 문의 수신",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "kakao-inbound",
+      "parameters": {
+        "path": "kakao-inbound",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://{{$env.PUBLIC_DOMAIN || 'localhost'}}/dify/v1/chat-messages",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": {
+            "query": "={{ $json.body.message || $json.body.content || $json.body }}"
+          },
+          "parameters": {
+            "user": "={{ $json.body.sender || 'unknown' }}"
+          },
+          "parameters": {
+            "response_mode": "blocking"
+          }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.DIFY_API_KEY}}"
+            }
+          ]
+        }
+      },
+      "id": "dify-analyze",
+      "name": "Dify AI 분석",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.answer }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "contains",
+                "singleValue": true,
+                "value": "[예약]"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-booking",
+      "name": "예약 요청인가?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": {
+            "eventTypeId": "={{ $json.eventTypeId }}"
+          },
+          "parameters": {
+            "start": "={{ $json.start }}"
+          },
+          "parameters": {
+            "name": "={{ $json.customerName }}"
+          },
+          "parameters": {
+            "email": "={{ $json.customerEmail }}"
+          },
+          "parameters": {
+            "notes": "={{ $json.notes }}"
+          }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CALCOM_API_KEY}}"
+            }
+          ]
+        },
+        "url": "=https://{{$env.PUBLIC_DOMAIN || 'localhost'}}/cal/api/v1/bookings"
+      },
+      "id": "calcom-booking",
+      "name": "Cal.com 예약 생성",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 180],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "channel": "default",
+        "text": "=예약이 확정되었습니다.\n\n고객: {{$json.name}}\n일정: {{$json.start}}\n\n감사합니다.",
+        "options": {}
+      },
+      "id": "slack-confirm",
+      "name": "사장님에게 확정 알림",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1200, 180],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "카톡에 성공 응답",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1200, 300],
+      "parameters": {
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" }
+            ]
+          }
+        },
+        "respondWith": "json",
+        "responseBody": "={ \"message\": \"예약 확정 완료\", \"booking\": $json }"
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "respond-faq",
+      "name": "카톡에 FAQ 응답",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [960, 420],
+      "parameters": {
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" }
+            ]
+          }
+        },
+        "respondWith": "json",
+        "responseBody": "={ \"message\": \"$json.answer\" }"
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "noop-human",
+      "name": "담당자 전환 알림",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [960, 560]
+    }
+  ],
+  "connections": {
+    "webhook-inbound": {
+      "main": [
+        [{ "node": "dify-analyze", "type": "main", "index": 0 }]
+      ]
+    },
+    "dify-analyze": {
+      "main": [
+        [{ "node": "if-booking", "type": "main", "index": 0 }]
+      ]
+    },
+    "if-booking": {
+      "main": [
+        [{ "node": "calcom-booking", "type": "main", "index": 0 }],
+        [{ "node": "respond-faq", "type": "main", "index": 0 }],
+        [{ "node": "noop-human", "type": "main", "index": 0 }]
+      ]
+    },
+    "calcom-booking": {
+      "main": [
+        [{ "node": "slack-confirm", "type": "main", "index": 0 }],
+        [{ "node": "respond-success", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
