@@ -19,6 +19,8 @@
 | `LLM_BASE` | process-queue | `https://api.openai.com/v1/chat/completions` |
 | `TELEGRAM_BOT_TOKEN` | process-queue | (선택) 사장님 텔레그램 봇 토큰 |
 | `TELEGRAM_CHAT_ID` | process-queue | (선택) 사장님 텔레그램 채팅 ID |
+| `CLOUDFLARE_ACCOUNT_ID` | deploy-pages | Cloudflare 계정 ID (대시보드 > 계정 > 계정 ID) |
+| `CLOUDFLARE_API_TOKEN` | deploy-pages | Cloudflare API 토큰 (Workers Pages API: Edit 권한) |
 
 ## 필요 시크릿 × 워크플로우 매트릭스
 
@@ -33,9 +35,11 @@
 | LLM_BASE | - | - | - | - | ✅ |
 | TELEGRAM_BOT_TOKEN | - | - | - | - | ✅ |
 | TELEGRAM_CHAT_ID | - | - | - | - | ✅ |
+| CLOUDFLARE_ACCOUNT_ID | ✅ | - | - | - | - |
+| CLOUDFLARE_API_TOKEN | ✅ | - | - | - | - |
 
-> deploy-pages, monitor-daily, report-monthly는 **시크릿이 필요 없습니다** (GitHub Pages 배포와 데이터 커밋만 수행).
-> monitor-daily는 랜딩페이지 → GitHub Pages 배포만 합니다.
+> monitor-daily, report-monthly, paypal-check, process-queue는 **데이터 커밋/처리**만 수행하므로 별도 배포 시크릿 불필요.
+> `deploy-pages`만 Cloudflare Pages 배포용 시크릿 필요.
 
 ## 텔레그램 봇 토큰 얻는 법 (선택)
 

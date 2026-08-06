@@ -58,9 +58,17 @@
   // Cloudflare Worker URL (주문 원장 기록용). 배포 후 교체!
   var WORKER_URL = 'https://kakao-gateway.REPLACE.workers.dev';
 
-  var selectedPlan = { name: 'lite', amount: '3.00', email: '' };
+  // URL 파라미터로 plan 자동 선택
+  var urlParams = new URLSearchParams(window.location.search);
+  var initialPlan = urlParams.get('plan') || 'lite';
+  var initialAmount = initialPlan === 'pro' ? '6.00' : '3.00';
+
+  var selectedPlan = { name: initialPlan, amount: initialAmount, email: '' };
 
   document.querySelectorAll('.plan').forEach(el => {
+    if (el.dataset.plan === initialPlan) {
+      el.classList.add('selected');
+    }
     el.addEventListener('click', () => {
       document.querySelectorAll('.plan').forEach(p => p.classList.remove('selected'));
       el.classList.add('selected');

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="BizFlow - 중소기업용 AI 자동화. 카카오톡 AI 응대, 예약 자동화, 경쟁사 모니터링을 무료 인프라로.">
+<title>BizFlow - 중소기업 AI 자동화</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', 'Pretendard', sans-serif; background: #0B1120; color: #E2E8F0; line-height: 1.6; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
+  .logo { font-size: 22px; font-weight: 800; color: #3B82F6; }
+  .logo span { color: #F59E0B; }
+  nav a { color: #94A3B8; text-decoration: none; font-size: 14px; margin-left: 24px; }
+  nav a:hover { color: #E2E8F0; }
+  .hero { text-align: center; padding: 80px 0 60px; }
+  .hero .badge { display: inline-block; background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); font-size: 13px; padding: 6px 16px; border-radius: 999px; margin-bottom: 24px; }
+  .hero h1 { font-size: 48px; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
+  .hero h1 .grad { background: linear-gradient(90deg, #3B82F6, #F59E0B); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { color: #94A3B8; font-size: 18px; max-width: 640px; margin: 0 auto 32px; }
+  .cta { display: inline-flex; gap: 12px; align-items: center; }
+  .btn { padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: 700; text-decoration: none; transition: all 200ms; }
+  .btn-primary { background: #3B82F6; color: white; }
+  .btn-primary:hover { background: #2563EB; }
+  .btn-ghost { background: transparent; color: #94A3B8; border: 1px solid #334155; }
+  .btn-ghost:hover { border-color: #64748B; color: #E2E8F0; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 60px 0; }
+  .stat { background: #111B31; border: 1px solid #1E293B; border-radius: 16px; padding: 24px; text-align: center; }
+  .stat .num { font-size: 32px; font-weight: 800; color: #F59E0B; }
+  .stat .lbl { color: #94A3B8; font-size: 14px; margin-top: 4px; }
+  h2 { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 12px; }
+  .sub { text-align: center; color: #94A3B8; margin-bottom: 48px; }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 80px; }
+  .feature { background: #111B31; border: 1px solid #1E293B; border-radius: 16px; padding: 28px; }
+  .feature .icon { font-size: 28px; margin-bottom: 12px; }
+  .feature h3 { font-size: 18px; margin-bottom: 8px; }
+  .feature p { color: #94A3B8; font-size: 14px; }
+  .pricing { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 760px; margin: 0 auto 80px; }
+  .plan { background: #111B31; border: 1px solid #1E293B; border-radius: 20px; padding: 32px; position: relative; }
+  .plan.pro { border-color: #F59E0B; }
+  .plan .tag { position: absolute; top: -14px; right: 24px; font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 999px; }
+  .plan.lite .tag { background: #334155; color: #94A3B8; }
+  .plan.pro .tag { background: #F59E0B; color: #0B1120; }
+  .plan .name { font-size: 16px; color: #94A3B8; margin-bottom: 8px; }
+  .plan .price { font-size: 40px; font-weight: 800; margin-bottom: 16px; }
+  .plan .price small { font-size: 16px; color: #64748B; font-weight: 400; }
+  .plan ul { list-style: none; margin-bottom: 24px; }
+  .plan li { font-size: 14px; color: #CBD5E1; padding: 6px 0; }
+  .plan li::before { content: '✓ '; color: #4ADE80; font-weight: 700; }
+  .plan .btn { width: 100%; text-align: center; }
+  footer { border-top: 1px solid #1E293B; padding: 32px 0; text-align: center; color: #64748B; font-size: 13px; }
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 32px; }
+    .stats, .features, .pricing { grid-template-columns: 1fr; }
+    nav a { margin-left: 12px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo">Biz<span>Flow</span></div>
+      <div>
+        <a href="#features">기능</a>
+        <a href="#pricing">요금제</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="badge">무료 인프라로 운영되는 중소기업 AI 자동화</div>
+      <h1>놓치는 문의와 예약,<br><span class="grad">AI가 24시간 잡아드립니다</span></h1>
+      <p>카카오톡 AI 응대 · 예약 자동화 · 경쟁사 모니터링. 비싼 솔루션 없이 구독 하나로 시작하세요.</p>
+      <div class="cta">
+        <a href="paypal-checkout.html" class="btn btn-primary">구독 시작하기</a>
+        <a href="#pricing" class="btn btn-ghost">요금제 보기</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="num">24h</div><div class="lbl">365일 AI 응대</div></div>
+        <div class="stat"><div class="num">0원</div><div class="lbl">인프라 비용</div></div>
+        <div class="stat"><div class="num">5분</div><div class="lbl">자동 설정</div></div>
+      </div>
+    </header>
+
+    <h2 id="features">왜 BizFlow인가</h2>
+    <p class="sub">수작업으로 하던 일을 전부 자동화합니다</p>
+    <div class="features">
+      <div class="feature"><div class="icon">💬</div><h3>카톡 AI 응대</h3><p>고객 문의에 AI가 즉시 답변. 야간·주말에도 놓치지 않습니다.</p></div>
+      <div class="feature"><div class="icon">📅</div><h3>예약 자동화</h3><p>상담 예약 요청을 감지해 캘린더에 자동 등록하고 확정합니다.</p></div>
+      <div class="feature"><div class="icon">📊</div><h3>경쟁사 모니터링</h3><p>경쟁사 가격·신제품 변화를 매일 크롤링해 리포트로 알려드립니다.</p></div>
+      <div class="feature"><div class="icon">🔔</div><h3>실시간 알림</h3><p>예약·문의·가격변동을 텔레그램으로 즉시 받아보세요.</p></div>
+      <div class="feature"><div class="icon">💰</div><h3>무료 인프라</h3><p>GitHub Actions + Cloudflare로 서버비용 0원. 부담 없이 시작.</p></div>
+      <div class="feature"><div class="icon">🔒</div><h3>안전한 결제</h3><p>PayPal로 안전하게 결제, 구독 관리는 자동.</p></div>
+    </div>
+
+    <h2 id="pricing">요금제</h2>
+    <p class="sub">필요한 만큼만 선택하세요</p>
+    <div class="pricing">
+      <div class="plan lite">
+        <div class="tag">LITE</div>
+        <div class="name">BizFlow Lite</div>
+        <div class="price">$3<small> /월</small></div>
+        <ul>
+          <li>카톡 AI 응대 (최대 15분)</li>
+          <li>예약 요청 → 수동 확정</li>
+          <li>텔레그램 알림</li>
+          <li>경쟁사 3개 모니터링</li>
+          <li>일일 리포트</li>
+        </ul>
+        <a href="paypal-checkout.html?plan=lite" class="btn btn-ghost">Lite 시작</a>
+      </div>
+      <div class="plan pro">
+        <div class="tag">PRO</div>
+        <div class="name">BizFlow Pro</div>
+        <div class="price">$6<small> /월</small></div>
+        <ul>
+          <li>카톡 AI 즉시 응답</li>
+          <li>예약 자동 확정 (Cal.com)</li>
+          <li>실시간 알림 + 이메일</li>
+          <li>경쟁사 10개 모니터링</li>
+          <li>월간 전략 리포트</li>
+          <li>우선 지원</li>
+        </ul>
+        <a href="paypal-checkout.html?plan=pro" class="btn btn-primary">Pro 시작</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 BizFlow · 문의: hello@bizflow.example · <a href="paypal-checkout.html" style="color:#64748B;">결제</a>
+  </footer>
+</body>
+</html>

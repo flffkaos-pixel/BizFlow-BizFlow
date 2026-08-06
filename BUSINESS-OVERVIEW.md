@@ -193,7 +193,7 @@ GitHub Actions (06:00) → run_monitor.py → 경쟁사 페이지 크롤링
 | 리소스 | 사용처 | 무료 근거 |
 |--------|--------|-----------|
 | GitHub Actions | 크롤링/리포트/결제확인/카톡 큐처리 | 공개 repo 2,000분/월 무료 |
-| GitHub Pages | 랜딩페이지 호스팅 | 무제한 무료 |
+| Cloudflare Pages | 랜딩페이지 호스팅 | 무제한 무료 (커스텀 도메인 포함) |
 | Cloudflare Workers | Lite 카톡 웹훅 게이트웨이 | 하루 10만 요청 무료 |
 | Cloudflare KV | Lite 메시지 큐 | 하루 1GB 무료 |
 | Oracle Cloud | Pro n8n/Dify/Cal.com 상시 서버 | ARM 4코어/24GB 평생 무료 |
@@ -210,7 +210,7 @@ GitHub Actions (06:00) → run_monitor.py → 경쟁사 페이지 크롤링
 - [x] 경쟁사 크롤링 — 매일 06:00 GitHub Actions
 - [x] 월간 리포트 — 매월 1일 자동 발송
 - [x] PayPal 결제 확인 — 2시간마다
-- [x] 랜딩페이지 배포 — push 시 자동
+- [x] 랜딩페이지 배포 — push 시 자동 (Cloudflare Pages)
 - [x] 카톡 AI 응대 (Lite) — 5분마다 큐 처리 (Worker + GA)
 - [x] 카톡 AI 즉시 응대 (Pro) — 24시간 Oracle + Dify
 - [x] 예약 자동확정 (Pro) — n8n + Cal.com

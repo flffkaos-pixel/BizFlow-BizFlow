@@ -17,8 +17,11 @@
   git branch -M main
   git push -u origin main
   ```
-- [ ] 저장소 **Settings → Pages** 에서 Source를 "GitHub Actions"로 설정
-- [ ] [GITHUB-SECRETS.md](GITHUB-SECRETS.md) 참고하여 시크릿 등록
+- [ ] **Cloudflare Pages 설정** (`CLOUDFLARE-PAGES.md` 참고):
+  - [ ] Cloudflare 계정 생성 (무료)
+  - [ ] Pages 프로젝트 `bizflow` 생성 (직접 업로드 방식)
+  - [ ] `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN` 시크릿 등록
+- [ ] [GITHUB-SECRETS.md](GITHUB-SECRETS.md) 참고하여 나머지 시크릿 등록
 
 ## Phase 2: 결제 준비 (PayPal) (1시간)
 
