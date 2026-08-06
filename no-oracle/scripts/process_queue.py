@@ -112,8 +112,8 @@ def send_telegram(text):
 
 def main():
     if not WORKER_URL:
-        print("WORKER_URL 환경변수가 필요합니다.")
-        sys.exit(1)
+        print("WORKER_URL 미설정. 시크릿 등록 전까지 대기합니다. (정상 종료)")
+        return
 
     pending = get_pending()
     messages = pending.get("pending", [])
