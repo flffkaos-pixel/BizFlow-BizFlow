@@ -11,8 +11,11 @@ venv/
 .env.local
 .env.*.local
 
-# CompWatch 스냅샷
-snapshots/*
+# CompWatch 스냅샷 (변경 감지용으로 저장소에 커밋됨 - 캐시만 제외)
+snapshots/*.html.bak
+snapshots/cache/
+!snapshots/
+!snapshots/*.html
 !snapshots/README.md
 
 # n8n 로컬 데이터
@@ -36,6 +39,6 @@ Thumbs.db
 # 임시
 *.log
 
-# �ӽ� worker ���
+# �ӽ� worker ���
 *.module.cjs
 wm.cjs

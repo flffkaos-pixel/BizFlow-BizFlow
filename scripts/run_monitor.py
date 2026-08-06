@@ -69,13 +69,16 @@ def main():
             f.write(html)
         print(f"  저장: {filename} ({len(html)} bytes)")
 
-        # 이전 스냅샷과 비교
-        prev_dir = f"snapshots/{grade}"
-        os.makedirs(prev_dir, exist_ok=True)
-        prev_files = sorted(f for f in os.listdir(prev_dir) if f.startswith(today) is False)
-
+        # 이전 스냅샷과 비교 (같은 grade의 과거 스냅샷 중 최신 것)
+        # 파일명 패턴: YYYY-MM-DD_{grade}_{checksum}.html
+        prev_files = sorted(
+            f for f in os.listdir("snapshots")
+            if f.endswith(".html")
+            and f"_{grade}_" in f
+            and f.split("_")[0] < today
+        )
         if prev_files:
-            with open(os.path.join(prev_dir, prev_files[-1]), "r", encoding="utf-8") as f:
+            with open(os.path.join("snapshots", prev_files[-1]), "r", encoding="utf-8") as f:
                 prev_html = f.read()
             prev_checksum = hashlib.sha256(prev_html.encode()).hexdigest()[:16]
             if prev_checksum != checksum:
