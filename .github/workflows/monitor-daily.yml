@@ -33,4 +33,5 @@ jobs:
           git config user.email "actions@github.com"
           git add -A
           git diff --cached --quiet || git commit -m "자동: 일일 모니터링 스냅샷 $(date +%Y-%m-%d)"
+          git pull --rebase origin main
           git push
