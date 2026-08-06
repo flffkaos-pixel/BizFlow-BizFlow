@@ -23,6 +23,8 @@ jobs:
         env:
           PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
           PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          PAYPAL_SANDBOX: ${{ secrets.PAYPAL_SANDBOX }}
+          WORKER_URL: ${{ secrets.WORKER_URL }}
         run: |
           python paypal/paypal_client.py > result.json 2>&1
           cat result.json

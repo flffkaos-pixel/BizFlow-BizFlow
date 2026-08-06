@@ -120,6 +120,63 @@ export default {
       return json({ ok: true });
     }
 
+    // ── 결제 주문 원장 ──────────────────────────
+    // 키: "order_<order_id>" → { order_id, plan, amount, email, status }
+    // 키: "order_index"      → ["order_xxx", "order_yyy", ...] 최신순
+
+    // POST /orders  — 랜딩페이지가 결제 시작 시 주문 기록
+    // body: { orderId, plan, amount, email }
+    if (path === "/orders" && request.method === "POST") {
+      const body = await readBody(request);
+      const orderId = body.orderId || body.order_id;
+      if (!orderId) return json({ error: "orderId 필요" }, 400);
+
+      const record = {
+        order_id: orderId,
+        plan: body.plan || "starter",
+        amount: body.amount || "0",
+        email: body.email || "",
+        status: "pending",
+        created_at: new Date().toISOString(),
+      };
+      await env.QUEUE.put(`order_${orderId}`, JSON.stringify(record));
+
+      // 인덱스에 추가 (중복 방지)
+      const index = (await env.QUEUE.get("order_index", "json")) || [];
+      if (!index.includes(`order_${orderId}`)) {
+        index.unshift(`order_${orderId}`);
+        await env.QUEUE.put("order_index", JSON.stringify(index.slice(0, 500)));
+      }
+      return json({ ok: true, order_id: orderId });
+    }
+
+    // GET /orders — 대기 중(pending) 주문 목록 조회 (paypal-check용)
+    if (path === "/orders" && request.method === "GET") {
+      const index = (await env.QUEUE.get("order_index", "json")) || [];
+      const orders = [];
+      for (const key of index) {
+        const rec = await env.QUEUE.get(key, "json");
+        if (rec) orders.push(rec);
+      }
+      // pending 상태만 필터
+      const pending = orders.filter((o) => o.status === "pending");
+      return json({ orders, pending });
+    }
+
+    // POST /orders/complete — 처리 완료 표시 (paypal-check 후)
+    // body: { orderId }
+    if (path === "/orders/complete" && request.method === "POST") {
+      const body = await readBody(request);
+      const orderId = body.orderId || body.order_id;
+      if (!orderId) return json({ error: "orderId 필요" }, 400);
+      const rec = await env.QUEUE.get(`order_${orderId}`, "json");
+      if (!rec) return json({ error: "주문 없음" }, 404);
+      rec.status = "completed";
+      rec.processed_at = new Date().toISOString();
+      await env.QUEUE.put(`order_${orderId}`, JSON.stringify(rec));
+      return json({ ok: true, order_id: orderId });
+    }
+
     return json({ error: "Not Found" }, 404);
   },
 };

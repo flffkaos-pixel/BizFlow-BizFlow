@@ -12,8 +12,8 @@
 |--------|-----------|------|
 | `PAYPAL_CLIENT_ID` | paypal-check | PayPal REST API Client ID |
 | `PAYPAL_CLIENT_SECRET` | paypal-check | PayPal REST API Secret |
-| `GITHUB_TOKEN` | paypal-check | GitHub가 자동 제공 (별도 등록 불필요) |
-| `WORKER_URL` | process-queue | Cloudflare Worker 주소 `https://kakao-gateway.xxx.workers.dev` |
+| `PAYPAL_SANDBOX` | paypal-check | `true`(테스트) / `false`(실서비스) |
+| `WORKER_URL` | process-queue, paypal-check | Cloudflare Worker 주소 `https://kakao-gateway.xxx.workers.dev` |
 | `LLM_API_KEY` | process-queue | OpenAI/Gemini API 키 |
 | `LLM_MODEL` | process-queue | `gpt-4o-mini` (기본) |
 | `LLM_BASE` | process-queue | `https://api.openai.com/v1/chat/completions` |
@@ -26,7 +26,8 @@
 |--------|:---:|:---:|:---:|:---:|:---:|
 | PAYPAL_CLIENT_ID | - | - | - | ✅ | - |
 | PAYPAL_CLIENT_SECRET | - | - | - | ✅ | - |
-| WORKER_URL | - | - | - | - | ✅ |
+| PAYPAL_SANDBOX | - | - | - | ✅ | - |
+| WORKER_URL | - | - | - | ✅ | ✅ |
 | LLM_API_KEY | - | - | - | - | ✅ |
 | LLM_MODEL | - | - | - | - | ✅ |
 | LLM_BASE | - | - | - | - | ✅ |
