@@ -305,7 +305,7 @@ function renderApp() {
     ['dashboard', t('nav_dashboard')], ['deals', t('nav_deals')], ['pipeline', t('nav_pipeline')],
     ['contacts', t('nav_contacts')], ['teams', t('nav_teams')], ['users', t('nav_users')],
     ['reminders', t('nav_reminders')], ['notifications', t('nav_notifications')],
-    ['settings', t('nav_settings')], ['webhooks', t('nav_webhooks')], ['audit', t('nav_audit')], ['trash', t('nav_trash')],
+    ['settings', t('nav_settings')], ['webhooks', t('nav_webhooks')], ['audit', t('nav_audit')], ['trash', t('nav_trash')], ['automation', t('nav_automation')],
   ];
   const unreadCount = (state.notifications || []).filter(n => !n.read).length;
   return `<div class="app-shell">
@@ -429,6 +429,7 @@ async function renderRoute() {
     case 'webhooks': return renderWebhooks();
     case 'audit': return renderAudit();
     case 'trash': return renderTrash();
+    case 'automation': return AUTOMATION_UI.render();
     default: return '<div class="empty-state"><p>404</p></div>';
   }
 }
@@ -444,6 +445,7 @@ function bindRoute() {
     case 'notifications': bindNotifications(); break;
     case 'settings': bindSettings(); break;
     case 'webhooks': bindWebhooks(); break;
+    case 'automation': AUTOMATION_UI.bind(); break;
     case 'trash': bindTrash(); break;
   }
 }
@@ -1124,6 +1126,7 @@ async function boot() {
     if (ws) loadAll();
   }
   render();
+  if (window.AUTOMATION) AUTOMATION.init();
 }
 
 boot();
