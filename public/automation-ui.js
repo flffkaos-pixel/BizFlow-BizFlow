@@ -97,7 +97,10 @@ const AUTOMATION_UI = (() => {
       <div class="template-filters">
         <button class="filter-btn active" data-industry="all">${t('all_industries')}</button>
         <button class="filter-btn" data-industry="common">${t('common')}</button>
-        <button class="filter-btn" data-industry="cafe">${t('cafe')}</button>
+        <button class="filter-btn" data-industry="cafe_individual">${t('cafe_individual')}</button>
+        <button class="filter-btn" data-industry="restaurant_individual">${t('restaurant_individual')}</button>
+        <button class="filter-btn" data-industry="cafe_franchise">${t('cafe_franchise')}</button>
+        <button class="filter-btn" data-industry="restaurant_franchise">${t('restaurant_franchise')}</button>
         <button class="filter-btn" data-industry="hospital">${t('hospital')}</button>
         <button class="filter-btn" data-industry="realestate">${t('realestate')}</button>
         <button class="filter-btn" data-industry="academy">${t('academy')}</button>
@@ -298,6 +301,9 @@ const AUTOMATION_UI = (() => {
     // 조건/액션 추가
     document.getElementById('btn-add-condition')?.addEventListener('click', () => addConditionRow());
     document.getElementById('btn-add-action')?.addEventListener('click', () => addActionRow());
+
+    // 데모 버튼 주입
+    if (window.DEMO_SEEDER) DEMO_SEEDER.injectDemoButton();
   }
 
   // ──────────────────────────────────────────────

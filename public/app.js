@@ -48,7 +48,8 @@ function initials(name) { return (name || '?').split(' ').map(w => w[0]).slice(0
 /* ============ api helper ============ */
 async function api(path, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
-  if (state.token) headers['Authorization'] = 'Bearer ' + state.token;
+  const token = state.token || localStorage.getItem('bizflow_token');
+  if (token) headers['Authorization'] = 'Bearer ' + token;
   const res = await fetch(API(path), { ...opts, headers });
   if (res.status === 401) {
     logout();
@@ -65,6 +66,9 @@ async function api(path, opts = {}) {
   }
   return body;
 }
+
+// 전역 노출
+window.api = api;
 
 function logout() {
   state.token = null; state.user = null;
