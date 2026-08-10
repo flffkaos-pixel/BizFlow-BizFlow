@@ -4,6 +4,14 @@
  * public/automation-templates.js
  */
 
+// 안전 가드: 에러 나도 기본 구조 export
+window.AUTOMATION_TEMPLATES = {};
+window.AUTOMATION_ALL_TEMPLATES = [];
+window.AUTOMATION_CAFE_INDIVIDUAL_TEMPLATES = [];
+window.AUTOMATION_REST_INDIVIDUAL_TEMPLATES = [];
+window.AUTOMATION_CAFE_FRANCHISE_TEMPLATES = [];
+window.AUTOMATION_REST_FRANCHISE_TEMPLATES = [];
+
 const AUTOMATION_TEMPLATES = {
   // ──────────────────────────────────────────────
   // 공통 (모든 업종)

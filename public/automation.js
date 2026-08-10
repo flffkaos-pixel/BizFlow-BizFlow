@@ -572,6 +572,103 @@ const AUTOMATION = (() => {
   }
 
   // ──────────────────────────────────────────────
+  // 라벨 헬퍼 (UI용)
+  // ──────────────────────────────────────────────
+  function getTriggerLabel(trigger) {
+    const labels = {
+      [TriggerType.DEAL_STAGE_CHANGED]: '딜 스테이지 변경',
+      [TriggerType.DEAL_CREATED]: '딜 생성',
+      [TriggerType.DEAL_UPDATED]: '딜 수정',
+      [TriggerType.CONTACT_CREATED]: '연락처 생성',
+      [TriggerType.CONTACT_UPDATED]: '연락처 수정',
+      [TriggerType.PAYMENT_RECEIVED]: '결제 완료',
+      [TriggerType.PAYMENT_FAILED]: '결제 실패',
+      [TriggerType.REMINDER_DUE]: '리마인더 마감',
+      [TriggerType.REMINDER_OVERDUE]: '리마인더 지연',
+      [TriggerType.SCHEDULED_TIME]: '예약 실행',
+      [TriggerType.WEBHOOK_RECEIVED]: '웹훅 수신',
+      [TriggerType.INACTIVITY]: '장기 미활동',
+      [TriggerType.CUSTOM_EVENT]: '사용자 이벤트',
+    };
+    return labels[trigger] || trigger;
+  }
+
+  function getConditionLabel(condition) {
+    const labels = {
+      [ConditionType.EQUALS]: '같음',
+      [ConditionType.NOT_EQUALS]: '다름',
+      [ConditionType.CONTAINS]: '포함',
+      [ConditionType.NOT_CONTAINS]: '미포함',
+      [ConditionType.GREATER_THAN]: '초과',
+      [ConditionType.LESS_THAN]: '미만',
+      [ConditionType.GREATER_EQUAL]: '이상',
+      [ConditionType.LESS_EQUAL]: '이하',
+      [ConditionType.IN]: '포함됨',
+      [ConditionType.NOT_IN]: '미포함',
+      [ConditionType.IS_EMPTY]: '비어있음',
+      [ConditionType.IS_NOT_EMPTY]: '비어있지 않음',
+      [ConditionType.REGEX_MATCH]: '정규식 매치',
+      [ConditionType.DAYS_SINCE]: '경과일수',
+      [ConditionType.DAYS_UNTIL]: '남은일수',
+    };
+    return labels[condition] || condition;
+  }
+
+  function getActionLabel(action) {
+    const labels = {
+      [ActionType.MOVE_DEAL_STAGE]: '딜 스테이지 이동',
+      [ActionType.UPDATE_DEAL]: '딜 수정',
+      [ActionType.CREATE_DEAL]: '딜 생성',
+      [ActionType.CREATE_CONTACT]: '연락처 생성',
+      [ActionType.UPDATE_CONTACT]: '연락처 수정',
+      [ActionType.TAG_CONTACT]: '연락처 태그',
+      [ActionType.CREATE_REMINDER]: '리마인더 생성',
+      [ActionType.COMPLETE_REMINDER]: '리마인더 완료',
+      [ActionType.SEND_NOTIFICATION]: '앱 알림 전송',
+      [ActionType.SEND_EMAIL]: '이메일 전송',
+      [ActionType.SEND_SMS]: '문자 전송',
+      [ActionType.SEND_KAKAO]: '카카오톡 전송',
+      [ActionType.SEND_SLACK]: '슬랙 전송',
+      [ActionType.SEND_WEBHOOK]: '웹훅 호출',
+      [ActionType.GENERATE_QUOTE]: '견적서 생성',
+      [ActionType.GENERATE_CONTRACT]: '계약서 생성',
+      [ActionType.SEND_DOCUMENT]: '문서 발송',
+      [ActionType.RUN_FUNCTION]: '함수 실행',
+      [ActionType.DELAY]: '대기',
+      [ActionType.CALL_API]: 'API 호출',
+      [ActionType.LOG_EVENT]: '로그 기록',
+    };
+    return labels[action] || action;
+  }
+
+  function getActionIcon(action) {
+    const icons = {
+      [ActionType.MOVE_DEAL_STAGE]: '➡️',
+      [ActionType.UPDATE_DEAL]: '✏️',
+      [ActionType.CREATE_DEAL]: '➕',
+      [ActionType.CREATE_CONTACT]: '👤',
+      [ActionType.UPDATE_CONTACT]: '👤',
+      [ActionType.TAG_CONTACT]: '🏷️',
+      [ActionType.CREATE_REMINDER]: '⏰',
+      [ActionType.COMPLETE_REMINDER]: '✅',
+      [ActionType.SEND_NOTIFICATION]: '🔔',
+      [ActionType.SEND_EMAIL]: '📧',
+      [ActionType.SEND_SMS]: '💬',
+      [ActionType.SEND_KAKAO]: '💬',
+      [ActionType.SEND_SLACK]: '💬',
+      [ActionType.SEND_WEBHOOK]: '🔗',
+      [ActionType.GENERATE_QUOTE]: '📄',
+      [ActionType.GENERATE_CONTRACT]: '📋',
+      [ActionType.SEND_DOCUMENT]: '📤',
+      [ActionType.RUN_FUNCTION]: '⚙️',
+      [ActionType.DELAY]: '⏳',
+      [ActionType.CALL_API]: '🌐',
+      [ActionType.LOG_EVENT]: '📝',
+    };
+    return icons[action] || '⚙️';
+  }
+
+  // ──────────────────────────────────────────────
   // 공개 API
   // ──────────────────────────────────────────────
   return {
@@ -640,3 +737,98 @@ window.AUTOMATION = AUTOMATION;
 window.TriggerType = AUTOMATION.TriggerType;
 window.ConditionType = AUTOMATION.ConditionType;
 window.ActionType = AUTOMATION.ActionType;
+
+// UI 헬퍼 전역 노출
+window.getTriggerLabel = (trigger) => {
+  const labels = {
+    deal_stage_changed: '딜 스테이지 변경',
+    deal_created: '딜 생성',
+    deal_updated: '딜 수정',
+    contact_created: '연락처 생성',
+    contact_updated: '연락처 수정',
+    payment_received: '결제 완료',
+    payment_failed: '결제 실패',
+    reminder_due: '리마인더 마감',
+    reminder_overdue: '리마인더 지연',
+    scheduled_time: '예약 실행',
+    webhook_received: '웹훅 수신',
+    inactivity: '장기 미활동',
+    custom_event: '사용자 이벤트',
+  };
+  return labels[trigger] || trigger;
+};
+
+window.getActionLabel = (action) => {
+  const labels = {
+    move_deal_stage: '딜 스테이지 이동',
+    update_deal: '딜 수정',
+    create_deal: '딜 생성',
+    create_contact: '연락처 생성',
+    update_contact: '연락처 수정',
+    tag_contact: '연락처 태그',
+    create_reminder: '리마인더 생성',
+    complete_reminder: '리마인더 완료',
+    send_notification: '앱 알림 전송',
+    send_email: '이메일 전송',
+    send_sms: '문자 전송',
+    send_kakao: '카카오톡 전송',
+    send_slack: '슬랙 전송',
+    send_webhook: '웹훅 호출',
+    generate_quote: '견적서 생성',
+    generate_contract: '계약서 생성',
+    send_document: '문서 발송',
+    run_function: '함수 실행',
+    delay: '대기',
+    call_api: 'API 호출',
+    log_event: '로그 기록',
+  };
+  return labels[action] || action;
+};
+
+window.getActionIcon = (action) => {
+  const icons = {
+    move_deal_stage: '➡️',
+    update_deal: '✏️',
+    create_deal: '➕',
+    create_contact: '👤',
+    update_contact: '👤',
+    tag_contact: '🏷️',
+    create_reminder: '⏰',
+    complete_reminder: '✅',
+    send_notification: '🔔',
+    send_email: '📧',
+    send_sms: '💬',
+    send_kakao: '💬',
+    send_slack: '💬',
+    send_webhook: '🔗',
+    generate_quote: '📄',
+    generate_contract: '📋',
+    send_document: '📤',
+    run_function: '⚙️',
+    delay: '⏳',
+    call_api: '🌐',
+    log_event: '📝',
+  };
+  return icons[action] || '⚙️';
+};
+
+window.getOperatorLabel = (op) => {
+  const labels = {
+    equals: '같음',
+    not_equals: '다름',
+    contains: '포함',
+    not_contains: '미포함',
+    gt: '초과',
+    lt: '미만',
+    gte: '이상',
+    lte: '이하',
+    'in': '포함됨',
+    not_in: '미포함',
+    is_empty: '비어있음',
+    is_not_empty: '비어있지 않음',
+    regex: '정규식 매치',
+    days_since: '경과일수',
+    days_until: '남은일수',
+  };
+  return labels[op] || op;
+};

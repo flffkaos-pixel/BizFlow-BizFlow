@@ -154,14 +154,22 @@ function render() {
   }
   root.innerHTML = renderApp();
   bindApp();
-  renderContent();
+  // 비동기 콘텐츠 렌더링 (에러 처리 포함)
+  renderContent().catch(e => console.error('renderContent error:', e));
 }
 
 async function renderContent() {
   if (!state.token || !state.user || !state.currentWorkspace) return;
   const content = document.getElementById('content');
-  if (content) content.innerHTML = await renderRoute();
-  bindRoute();
+  if (!content) { console.error('renderContent: #content not found'); return; }
+  try {
+    const html = await renderRoute();
+    content.innerHTML = html;
+    bindRoute();
+  } catch (e) {
+    console.error('renderContent error:', e);
+    content.innerHTML = `<div class="empty-state"><p>렌더링 오류: ${e.message}</p></div>`;
+  }
 }
 function langSwitchBtn() {
   return `<div class="lang-switch">
@@ -241,6 +249,7 @@ function bindAuth() {
       const ws = state.workspaces.find(w => w.id === result.user.workspaceId) || state.workspaces[0] || null;
       state.currentWorkspace = ws;
       state.route = 'dashboard';
+      await loadAll();  // 로그인 후 데이터 로드 추가
       render();
     } catch (err) {
       errBox.innerHTML = `<div class="error-box">${state.authMode === 'login' ? t('invalid_credentials') : t('registration_failed')}</div>`;

@@ -108,7 +108,7 @@ const AUTOMATION_UI = (() => {
         <button class="filter-btn" data-industry="beauty">${t('beauty')}</button>
       </div>
       <div class="template-grid" id="template-grid">
-        ${all.map((tpl, idx) => renderTemplateCard(tpl, idx)).join('')}
+        ${(window.AUTOMATION_ALL_TEMPLATES || []).map((tpl, idx) => renderTemplateCard(tpl, idx)).join('')}
       </div>
     </div>
     `;
@@ -576,9 +576,8 @@ const AUTOMATION_UI = (() => {
   }
 
   function filterTemplates(industry) {
-    // 현재는 전체 표시, 산업별 필터링은 템플릿에 industry 필드 추가 시 구현
     const grid = document.getElementById('template-grid');
-    const all = AUTOMATION_ALL_TEMPLATES || [];
+    const all = window.AUTOMATION_ALL_TEMPLATES || [];
     grid.innerHTML = all.map((tpl, idx) => renderTemplateCard(tpl, idx)).join('');
     grid.querySelectorAll('.btn-use-template').forEach(b => b.addEventListener('click', e => useTemplate(parseInt(e.target.dataset.idx))));
   }
