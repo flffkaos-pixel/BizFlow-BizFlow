@@ -1,0 +1,4 @@
+﻿User-agent: *
+Allow: /
+Allow: /research/
+Sitemap: https://bizflow.pages.dev/sitemap.xml
