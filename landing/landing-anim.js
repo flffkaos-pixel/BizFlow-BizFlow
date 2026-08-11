@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var DEMO_URL = "paypal-checkout.html";
+  var DEMO_URL = "http://localhost:8787";
 
   var burger = document.getElementById("burger");
   var menu = document.getElementById("mobileMenu");
