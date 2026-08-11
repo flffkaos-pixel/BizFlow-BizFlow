@@ -1,0 +1,20 @@
+# BizFlow CRM 웹 서비스 배포 (Oracle Cloud)
+#
+# master 브랜치에 server.js + public/ 이 함께 있으므로 이 compose 로 단독 배포한다.
+#
+#   서버에서:
+#   git clone https://github.com/사용자명/저장소명.git bizflow
+#   cd bizflow && git checkout master
+#   docker compose up -d --build
+#   -> 접속: http://<SERVER_IP>:8787
+
+services:
+  bizflow:
+    build: .
+    container_name: bizflow-crm
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      - PORT=8787
+      - API_TARGET=https://bizflowapis.pixuate.dev
