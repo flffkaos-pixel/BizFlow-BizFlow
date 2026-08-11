@@ -187,13 +187,31 @@ async function api(path, opts = {}) {
 
     // 4. 고객
     console.log('☕ 고객 시딩 중...');
+    const ownerId = state.user.id;
+    // 이전 데모 시딩 데이터 정리 (중복 방지)
+    try {
+      const existingContacts = await safeApi('/contacts?workspaceId=' + state.currentWorkspace.id);
+      const conList = Array.isArray(existingContacts) ? existingContacts : ((existingContacts || {}).data || []);
+      for (const ec of conList) {
+        if (ec.company === '단골 고객') await safeApi('/contacts/' + ec.id, { method: 'DELETE' });
+      }
+      const existingDeals = await safeApi('/deals?workspaceId=' + state.currentWorkspace.id + '&limit=1000');
+      const dealList = Array.isArray(existingDeals) ? existingDeals : ((existingDeals || {}).data || []);
+      for (const ed of dealList) {
+        if ((ed.title || '').startsWith('일매출:')) await safeApi('/deals/' + ed.id, { method: 'DELETE' });
+      }
+    } catch (e) { console.warn('[Demo] 기존 데이터 정리 실패(무시):', e.message); }
     for (const c of sampleCustomers) {
       try {
         await safeApi('/contacts', { method: 'POST', body: JSON.stringify({
           workspaceId: state.currentWorkspace.id,
           firstName: c.name,
+          lastName: '단골',
+          type: 'Customer',
+          ownerId,
           phone: c.phone,
           email: c.email,
+          company: '단골 고객',
           metadata: { visitCount: c.visitCount, totalSpent: c.totalSpent, lastVisit: c.lastVisit, birthday: c.birthday, favoriteMenu: c.favoriteMenu }
         }) });
         results.customers++;
@@ -203,17 +221,24 @@ async function api(path, opts = {}) {
     // 5. 매출
     console.log('📊 매출 시딩 중...');
     const salesData = generateDailySales();
+    const ws = state.currentWorkspace || {};
+    const currency = ws.defaultCurrency || 'KRW';
     for (const s of salesData) {
       try {
         await safeApi('/deals', { method: 'POST', body: JSON.stringify({
           workspaceId: state.currentWorkspace.id,
           title: `일매출: ${s.date}`,
           value: s.dailySales,
+          currency,
+          clientType: 'INDIVIDUAL',
           stage: 'WON',
+          probability: 100,
+          assignedToUserId: ownerId,
           source: 'DAILY_SALES',
           clientName: '매장 일매출',
-          contactEmail: '',
+          contactEmail: `sales.${s.date}@example.com`,
           contactPhone: '',
+          expectedCloseDate: new Date(s.date + 'T23:59:59').toISOString(),
           metadata: { date: s.date, dailySales: s.dailySales, orderCount: s.orderCount, dailyTarget: s.dailyTarget, avgTicket: s.avgTicket, achRate: s.achRate, isWeekend: s.isWeekend }
         }) });
         results.sales++;
@@ -243,6 +268,7 @@ async function api(path, opts = {}) {
     for (const tpl of templates) {
       try {
         const wf = {
+          id: `wf_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
           name: tpl.name,
           description: tpl.description,
           enabled: true,

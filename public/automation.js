@@ -399,14 +399,15 @@ const AUTOMATION = (() => {
       case ActionType.RUN_FUNCTION: {
         const { code } = config;
         if (!code) throw new Error('code required');
-        const fn = new Function('context', 'api', 'state', 't', 'utils', code);
+        // 템플릿 코드는 top-level await/return 을 사용하므로 async IIFE 로 감싼다
+        const fn = new Function('context', 'api', 'state', 't', 'utils', `return (async () => {\n${code}\n})();`);
         const result = await fn(context, api, state, t, {
           evaluateCondition,
           getNestedValue,
           resolveValue,
           sanitizeContext,
         });
-        context.functionResult = result;
+        if (result !== undefined) context.functionResult = result;
         break;
       }
       case ActionType.DELAY: {
