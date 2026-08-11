@@ -314,11 +314,26 @@ function bindWorkspacePicker() {
 /* ============ APP LAYOUT ============ */
 function renderApp() {
   const ws = state.currentWorkspace;
-  const navItems = [
-    ['dashboard', t('nav_dashboard')], ['deals', t('nav_deals')], ['pipeline', t('nav_pipeline')],
-    ['contacts', t('nav_contacts')], ['teams', t('nav_teams')], ['users', t('nav_users')],
-    ['reminders', t('nav_reminders')], ['notifications', t('nav_notifications')],
-    ['settings', t('nav_settings')], ['webhooks', t('nav_webhooks')], ['audit', t('nav_audit')], ['trash', t('nav_trash')], ['automation', t('nav_automation')],
+  const core = [
+    ['dashboard', t('nav_dashboard'), t('nav_sub_dashboard')],
+    ['automation', t('nav_automation'), t('nav_sub_automation')],
+    ['deals', t('nav_deals'), t('nav_sub_deals')],
+    ['contacts', t('nav_contacts'), t('nav_sub_contacts')],
+  ];
+  const followup = [
+    ['reminders', t('nav_reminders'), t('nav_sub_reminders')],
+    ['notifications', t('nav_notifications'), t('nav_sub_notifications')],
+    ['pipeline', t('nav_pipeline'), t('nav_sub_pipeline')],
+  ];
+  const staff = [
+    ['users', t('nav_users'), t('nav_sub_users')],
+    ['teams', t('nav_teams'), t('nav_sub_teams')],
+  ];
+  const admin = [
+    ['settings', t('nav_settings'), t('nav_sub_settings')],
+    ['webhooks', t('nav_webhooks'), t('nav_sub_webhooks')],
+    ['audit', t('nav_audit'), t('nav_sub_audit')],
+    ['trash', t('nav_trash'), t('nav_sub_trash')],
   ];
   const unreadCount = (state.notifications || []).filter(n => !n.read).length;
   return `<div class="app-shell">
@@ -328,12 +343,14 @@ function renderApp() {
         <div class="logo-text"><h2>${t('appName')}</h2><p>${t('appTag')}</p></div>
       </div>
       <nav class="nav-section">
-        <div class="nav-label">${t('nav_dashboard').toUpperCase()}</div>
-        ${navItems.slice(0, 4).map(([r, label]) => navItem(r, label, r === 'notifications' ? unreadCount : 0)).join('')}
-        <div class="nav-label">${t('nav_teams').toUpperCase()}</div>
-        ${navItems.slice(4, 8).map(([r, label]) => navItem(r, label, r === 'notifications' ? unreadCount : 0)).join('')}
-        <div class="nav-label">${t('nav_settings').toUpperCase()}</div>
-        ${navItems.slice(8).map(([r, label]) => navItem(r, label, 0)).join('')}
+        <div class="nav-label">${t('nav_group_overview').toUpperCase()}</div>
+        ${core.map(([r, label, sub]) => navItem(r, label, r === 'notifications' ? unreadCount : 0, sub)).join('')}
+        <div class="nav-label">${t('nav_group_followup').toUpperCase()}</div>
+        ${followup.map(([r, label, sub]) => navItem(r, label, r === 'notifications' ? unreadCount : 0, sub)).join('')}
+        <div class="nav-label">${t('nav_group_staff').toUpperCase()}</div>
+        ${staff.map(([r, label, sub]) => navItem(r, label, 0, sub)).join('')}
+        <div class="nav-label">${t('nav_group_settings').toUpperCase()}</div>
+        ${admin.map(([r, label, sub]) => navItem(r, label, 0, sub)).join('')}
       </nav>
       <div class="sidebar-footer">
         <div class="workspace-pill">
@@ -358,7 +375,10 @@ function renderApp() {
       <div class="topbar">
         <div style="display:flex;align-items:center;gap:12px;">
           <button class="btn-icon mobile-nav-toggle" id="mobile-nav-toggle" style="color:var(--navy)">${icon('menu')}</button>
-          <h1>${esc(pageTitle())}</h1>
+          <div>
+            <h1>${esc(pageTitle())}</h1>
+            <div class="page-sub" id="page-sub">${esc(pageSub())}</div>
+          </div>
         </div>
         <div class="topbar-right">
           <button class="btn-icon" id="nav-refresh" title="${t('refresh')}" style="color:var(--navy)">${icon('refresh')}</button>
@@ -370,9 +390,9 @@ function renderApp() {
   </div>`;
 }
 
-function navItem(route, label, badge) {
+function navItem(route, label, badge, sub) {
   return `<button class="nav-item ${state.route === route ? 'active' : ''}" data-nav="${route}">
-    ${icon(route)}<span>${label}</span>${badge > 0 ? `<span class="nav-badge">${badge}</span>` : ''}
+    ${icon(route)}<span class="nav-item-text"><span class="nav-item-label">${label}</span>${sub ? `<span class="nav-item-sub">${sub}</span>` : ''}</span>${badge > 0 ? `<span class="nav-badge">${badge}</span>` : ''}
   </button>`;
 }
 
@@ -384,6 +404,17 @@ function pageTitle() {
     webhooks: t('nav_webhooks'), audit: t('nav_audit'), trash: t('nav_trash'),
   };
   return map[state.route] || state.route;
+}
+
+function pageSub() {
+  const map = {
+    dashboard: t('nav_sub_dashboard'), deals: t('nav_sub_deals'), pipeline: t('nav_sub_pipeline'),
+    contacts: t('nav_sub_contacts'), teams: t('nav_sub_teams'), users: t('nav_sub_users'),
+    reminders: t('nav_sub_reminders'), notifications: t('nav_sub_notifications'), settings: t('nav_sub_settings'),
+    webhooks: t('nav_sub_webhooks'), audit: t('nav_sub_audit'), trash: t('nav_sub_trash'),
+    automation: t('nav_sub_automation'),
+  };
+  return map[state.route] || '';
 }
 
 function roleLabel(role) {
@@ -449,6 +480,7 @@ async function renderRoute() {
 
 function bindRoute() {
   switch (state.route) {
+    case 'dashboard': bindDashboard(); break;
     case 'deals': bindDeals(); break;
     case 'pipeline': bindPipeline(); break;
     case 'contacts': bindContacts(); break;
@@ -485,6 +517,15 @@ async function renderDashboard() {
   const maxStage = Math.max(1, ...stageBreakdown.map(s => s.totalValue || 0));
 
   return `
+  <div class="welcome-strip">
+    <div class="welcome-emoji">👋</div>
+    <div class="welcome-body">
+      <div class="welcome-title">${t('welcome_title')}</div>
+      <div class="welcome-text">${t('welcome_text')}</div>
+      <button class="btn btn-navy btn-sm" id="welcome-to-auto">${t('welcome_cta')}</button>
+      <span class="welcome-note">${t('welcome_cta_note')}</span>
+    </div>
+  </div>
   <div class="stat-grid">
     ${statCard(t('total_pipeline_value'), money(c.totalPipelineValue), c.trends ? trendText(c.trends.pipelineValueChange) : '')}
     ${statCard(t('weighted_forecast'), money(c.weightedForecast), t('prob_adjusted'))}
@@ -519,6 +560,11 @@ async function renderDashboard() {
       </div>
     </div>
   </div>`;
+}
+
+function bindDashboard() {
+  const btn = document.getElementById('welcome-to-auto');
+  if (btn) btn.addEventListener('click', () => navigate('automation'));
 }
 
 function statCard(label, value, sub) {
