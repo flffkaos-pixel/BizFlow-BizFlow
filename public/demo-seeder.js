@@ -127,93 +127,106 @@ const DEMO_SEEDER = (() => {
     { staffName: '박라떼', staffPhone: '010-3333-4444', role: '바리스타', startAt: '2025-01-26T13:00:00', endAt: '2025-01-26T22:00:00', breakAt: '2025-01-26T17:00:00' },
   ];
 
-  // ──────────────────────────────────────────────
-  // API 헬퍼 (전역 api 사용)
-  // ──────────────────────────────────────────────
-  async function api(path, opts = {}) {
-    return window.api(path, opts);
+// ──────────────────────────────────────────────
+// API 헬퍼 (전역 api 사용 + 타임아웃)
+// ──────────────────────────────────────────────
+console.log('[DemoSeeder] IIFE start');
+async function api(path, opts = {}) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000); // 3초 타임아웃
+    try {
+      const res = await window.api(path, { ...opts, signal: controller.signal });
+      clearTimeout(timeout);
+      return res;
+    } catch (e) {
+      clearTimeout(timeout);
+      throw e;
+    }
   }
 
   // ──────────────────────────────────────────────
-  // 메인 시드 함수
+  // 메인 시드 함수 (개별 트라이캐치 + 타임아웃)
   // ──────────────────────────────────────────────
   async function seedAll() {
     const results = { staff: 0, inventory: 0, equipments: 0, customers: 0, sales: 0, schedules: 0, errors: [] };
 
-    try {
-      // 1. 직원 (커스텀 엔드포인트 시뮬레이션 - localStorage 사용)
-      console.log('📝 직원 시딩 중...');
-      for (const s of sampleStaff) {
-        try {
-          await api('/custom/staff', { method: 'POST', body: JSON.stringify({ ...s, workspaceId: state.currentWorkspace.id }) });
-          results.staff++;
-        } catch (e) { results.errors.push(`staff:${s.name}:${e.message}`); }
+    const safeApi = async (path, opts = {}) => {
+      try {
+        return await api(path, opts);
+      } catch (e) {
+        throw e;
       }
+    };
 
-      // 2. 재고
-      console.log('📦 재고 시딩 중...');
-      for (const i of sampleInventory) {
-        try {
-          await api('/custom/inventory', { method: 'POST', body: JSON.stringify({ ...i, workspaceId: state.currentWorkspace.id }) });
-          results.inventory++;
-        } catch (e) { results.errors.push(`inventory:${i.name}:${e.message}`); }
-      }
+    // 1. 직원
+    console.log('📝 직원 시딩 중...');
+    for (const s of sampleStaff) {
+      try {
+        await safeApi('/custom/staff', { method: 'POST', body: JSON.stringify({ ...s, workspaceId: state.currentWorkspace.id }) });
+        results.staff++;
+      } catch (e) { results.errors.push(`staff:${s.name}:${e.message}`); }
+    }
 
-      // 3. 장비
-      console.log('🔧 장비 시딩 중...');
-      for (const e of sampleEquipments) {
-        try {
-          await api('/custom/equipments', { method: 'POST', body: JSON.stringify({ ...e, workspaceId: state.currentWorkspace.id }) });
-          results.equipments++;
-        } catch (e) { results.errors.push(`equipments:${e.name}:${e.message}`); }
-      }
+    // 2. 재고
+    console.log('📦 재고 시딩 중...');
+    for (const i of sampleInventory) {
+      try {
+        await safeApi('/custom/inventory', { method: 'POST', body: JSON.stringify({ ...i, workspaceId: state.currentWorkspace.id }) });
+        results.inventory++;
+      } catch (e) { results.errors.push(`inventory:${i.name}:${e.message}`); }
+    }
 
-      // 4. 고객
-      console.log('☕ 고객 시딩 중...');
-      for (const c of sampleCustomers) {
-        try {
-          await api('/contacts', { method: 'POST', body: JSON.stringify({
-            workspaceId: state.currentWorkspace.id,
-            firstName: c.name,
-            phone: c.phone,
-            email: c.email,
-            metadata: { visitCount: c.visitCount, totalSpent: c.totalSpent, lastVisit: c.lastVisit, birthday: c.birthday, favoriteMenu: c.favoriteMenu }
-          }) });
-          results.customers++;
-        } catch (e) { results.errors.push(`customers:${c.name}:${e.message}`); }
-      }
+    // 3. 장비
+    console.log('🔧 장비 시딩 중...');
+    for (const e of sampleEquipments) {
+      try {
+        await safeApi('/custom/equipments', { method: 'POST', body: JSON.stringify({ ...e, workspaceId: state.currentWorkspace.id }) });
+        results.equipments++;
+      } catch (e) { results.errors.push(`equipments:${e.name}:${e.message}`); }
+    }
 
-      // 5. 매출 (딜로 저장 - metadata에 날짜/매출 정보)
-      console.log('📊 매출 시딩 중...');
-      const salesData = generateDailySales();
-      for (const s of salesData) {
-        try {
-          await api('/deals', { method: 'POST', body: JSON.stringify({
-            workspaceId: state.currentWorkspace.id,
-            title: `일매출: ${s.date}`,
-            value: s.dailySales,
-            stage: 'WON',
-            source: 'DAILY_SALES',
-            clientName: '매장 일매출',
-            contactEmail: '',
-            contactPhone: '',
-            metadata: { date: s.date, dailySales: s.dailySales, orderCount: s.orderCount, dailyTarget: s.dailyTarget, avgTicket: s.avgTicket, achRate: s.achRate, isWeekend: s.isWeekend }
-          }) });
-          results.sales++;
-        } catch (e) { results.errors.push(`sales:${s.date}:${e.message}`); }
-      }
+    // 4. 고객
+    console.log('☕ 고객 시딩 중...');
+    for (const c of sampleCustomers) {
+      try {
+        await safeApi('/contacts', { method: 'POST', body: JSON.stringify({
+          workspaceId: state.currentWorkspace.id,
+          firstName: c.name,
+          phone: c.phone,
+          email: c.email,
+          metadata: { visitCount: c.visitCount, totalSpent: c.totalSpent, lastVisit: c.lastVisit, birthday: c.birthday, favoriteMenu: c.favoriteMenu }
+        }) });
+        results.customers++;
+      } catch (e) { results.errors.push(`customers:${c.name}:${e.message}`); }
+    }
 
-      // 6. 스케줄
-      console.log('👥 스케줄 시딩 중...');
-      for (const s of sampleSchedules) {
-        try {
-          await api('/custom/staff-schedules', { method: 'POST', body: JSON.stringify({ ...s, workspaceId: state.currentWorkspace.id }) });
-          results.schedules++;
-        } catch (e) { results.errors.push(`schedules:${s.staffName}:${e.message}`); }
-      }
+    // 5. 매출
+    console.log('📊 매출 시딩 중...');
+    const salesData = generateDailySales();
+    for (const s of salesData) {
+      try {
+        await safeApi('/deals', { method: 'POST', body: JSON.stringify({
+          workspaceId: state.currentWorkspace.id,
+          title: `일매출: ${s.date}`,
+          value: s.dailySales,
+          stage: 'WON',
+          source: 'DAILY_SALES',
+          clientName: '매장 일매출',
+          contactEmail: '',
+          contactPhone: '',
+          metadata: { date: s.date, dailySales: s.dailySales, orderCount: s.orderCount, dailyTarget: s.dailyTarget, avgTicket: s.avgTicket, achRate: s.achRate, isWeekend: s.isWeekend }
+        }) });
+        results.sales++;
+      } catch (e) { results.errors.push(`sales:${s.date}:${e.message}`); }
+    }
 
-    } catch (e) {
-      results.errors.push(`fatal:${e.message}`);
+    // 6. 스케줄
+    console.log('👥 스케줄 시딩 중...');
+    for (const s of sampleSchedules) {
+      try {
+        await safeApi('/custom/staff-schedules', { method: 'POST', body: JSON.stringify({ ...s, workspaceId: state.currentWorkspace.id }) });
+        results.schedules++;
+      } catch (e) { results.errors.push(`schedules:${s.staffName}:${e.message}`); }
     }
 
     return results;
@@ -223,7 +236,9 @@ const DEMO_SEEDER = (() => {
   // 자동화 템플릿 5개 일괄 활성화
   // ──────────────────────────────────────────────
   async function activateCafeTemplates() {
-    const templates = AUTOMATION_CAFE_TEMPLATES || [];
+    console.log('[Demo] activateCafeTemplates called');
+    const templates = window.AUTOMATION_CAFE_INDIVIDUAL_TEMPLATES || [];
+    console.log('[Demo] Found templates:', templates.length);
     let activated = 0;
     for (const tpl of templates) {
       try {
@@ -236,16 +251,32 @@ const DEMO_SEEDER = (() => {
           conditions: tpl.conditions || [],
           actions: tpl.actions || [],
         };
-        AUTOMATION.createWorkflow(wf);
+        console.log('[Demo] Creating workflow:', tpl.name);
+        const created = AUTOMATION.createWorkflow(wf);
+        console.log('[Demo] Created:', created.id);
         activated++;
       } catch (e) {
-        console.error(`템플릿 활성화 실패: ${tpl.name}`, e);
+        console.error('[Demo] 템플릿 활성화 실패:', tpl.name, e);
       }
     }
+    console.log('[Demo] Total activated:', activated);
     return activated;
   }
 
-  // ──────────────────────────────────────────────
+// ──────────────────────────────────────────────
+// 즉시 실행 테스트용 (개발용)
+// ──────────────────────────────────────────────
+window.testActivateCafe = async function() {
+  console.log('[Test] Manual testActivateCafe called');
+  return await activateCafeTemplates();
+};
+
+// activateCafeTemplates도 window에 노출 (테스트용)
+window.activateCafeTemplates = activateCafeTemplates;
+
+// 페이지 로드 시 자동 실행 안 함 (버튼 클릭 시에만)
+
+// ──────────────────────────────────────────────
   // 원클릭 전체 데모 설정
   // ──────────────────────────────────────────────
   async function runFullDemo() {
@@ -253,15 +284,22 @@ const DEMO_SEEDER = (() => {
     if (btn) { btn.disabled = true; btn.textContent = '⏳ 데모 설정 중...'; }
 
     try {
-      const seedResult = await seedAll();
+      console.log('[Demo] runFullDemo started');
+      
+      // 1. 먼저 워크플로 즉시 활성화 (빠름)
+      console.log('[Demo] Calling activateCafeTemplates...');
       const autoResult = await activateCafeTemplates();
+      console.log('[Demo] activateCafeTemplates returned:', autoResult);
       
-      // 대시보드 새로고침 트리거
-      if (window.loadAll) await loadAll();
-      if (window.render) render();
-      if (window.AUTOMATION_UI) AUTOMATION_UI.refresh('workflows');
-      
-      const msg = `✅ 데모 설정 완료!
+      // 2. 샘플 데이터 시딩은 백그라운드에서 (비차단)
+      seedAll().then(seedResult => {
+        console.log('[Demo] seedAll completed:', seedResult);
+        // 대시보드 새로고침 트리거
+        if (window.loadAll) loadAll();
+        if (window.render) render();
+        if (window.AUTOMATION_UI) AUTOMATION_UI.refresh('workflows');
+        
+        const msg = `✅ 데모 설정 완료!
 👥 직원: ${seedResult.staff}명
 📦 재고: ${seedResult.inventory}종
 🔧 장비: ${seedResult.equipments}대
@@ -269,15 +307,20 @@ const DEMO_SEEDER = (() => {
 📊 매출: ${seedResult.sales}일치
 👥 스케줄: ${seedResult.schedules}건
 🤖 자동화: ${autoResult}개 활성화
-${seedResult.errors.length ? `\n⚠️ 오류: ${seedResult.errors.join(', ')}` : ''}`;
-      
-      alert(msg);
-      console.log('데모 결과:', seedResult, autoResult);
+${seedResult.errors.length ? `\n⚠️ 일부 시딩 실패(무시 가능): ${seedResult.errors.slice(0,3).join(', ')}` : ''}`;
+        
+        if (btn) { btn.disabled = false; btn.textContent = '🎬 카페 데모 시작 (원클릭)'; }
+        alert(msg);
+        console.log('데모 결과:', seedResult, autoResult);
+      }).catch(e => {
+        console.error('[Demo] seedAll error:', e);
+        if (btn) { btn.disabled = false; btn.textContent = '🎬 카페 데모 시작 (원클릭)'; }
+      });
       
     } catch (e) {
+      console.error('[Demo] runFullDemo error:', e);
       alert('❌ 데모 설정 실패: ' + e.message);
       console.error(e);
-    } finally {
       if (btn) { btn.disabled = false; btn.textContent = '🎬 카페 데모 시작 (원클릭)'; }
     }
   }
@@ -303,5 +346,14 @@ ${seedResult.errors.length ? `\n⚠️ 오류: ${seedResult.errors.join(', ')}` 
   // ──────────────────────────────────────────────
   return { seedAll, activateCafeTemplates, runFullDemo, injectDemoButton };
 })();
+
+console.log('[DemoSeeder] IIFE executed, DEMO_SEEDER exposed');
+
+// IIFE 내부 함수들을 window에 노출 (테스트/디버깅용)
+window.activateCafeTemplates = activateCafeTemplates;
+window.testActivateCafe = async function() {
+  console.log('[Test] Manual testActivateCafe called');
+  return await activateCafeTemplates();
+};
 
 window.DEMO_SEEDER = DEMO_SEEDER;

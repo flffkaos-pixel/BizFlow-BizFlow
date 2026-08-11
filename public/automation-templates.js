@@ -1036,16 +1036,16 @@ for (const s of stores) {
 }
 
 // 분위수 계산
-const metrics = ['sales', 'costRate', 'laborRate', 'turnover', 'satisfaction'];
-for (const m of metrics) {
-  const sorted = [...kpis].sort((a,b) => a[m] - b[m]);
-  for (const k of kpis) {
-    const idx = sorted.findIndex(s => s.storeId === k.storeId);
-    k[\`${m}Pct\`] = ((idx + 1) / sorted.length * 100).toFixed(0);
+  const metrics = ['sales', 'costRate', 'laborRate', 'turnover', 'satisfaction'];
+  for (const metric of metrics) {
+    const sorted = [...kpis].sort((a,b) => a[metric] - b[metric]);
+    for (const k of kpis) {
+      const idx = sorted.findIndex(s => s.storeId === k.storeId);
+      k[metric + 'Pct'] = ((idx + 1) / sorted.length * 100).toFixed(0);
+    }
   }
-}
 
-return kpis;` } },
+  return kpis;` } },
         { type: ActionType.RUN_FUNCTION, config: { code: `const { kpis } = context;
 const top10 = kpis.filter(k => k.salesPct >= 90);
 const bottom10 = kpis.filter(k => k.salesPct <= 10);
