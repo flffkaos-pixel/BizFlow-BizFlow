@@ -3,131 +3,349 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="BizFlow - 중소기업용 AI 자동화. 카카오톡 AI 응대, 예약 자동화, 경쟁사 모니터링을 무료 인프라로.">
-<title>BizFlow - 중소기업 AI 자동화</title>
+<title>BizFlow — Step Through. Work Smarter.</title>
+<meta name="description" content="바쁜 매장, 손이 부족한 가게. 매출·단골·할 일을 한 화면에 모아 컴퓨터가 대신 정리합니다.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23fff'/%3E%3Ctext x='50' y='70' font-size='54' font-family='Inter,Arial' font-weight='700' text-anchor='middle' fill='%23000'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, 'Segoe UI', 'Pretendard', sans-serif; background: #0B1120; color: #E2E8F0; line-height: 1.6; }
-  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-  nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
-  .logo { font-size: 22px; font-weight: 800; color: #3B82F6; }
-  .logo span { color: #F59E0B; }
-  nav a { color: #94A3B8; text-decoration: none; font-size: 14px; margin-left: 24px; }
-  nav a:hover { color: #E2E8F0; }
-  .hero { text-align: center; padding: 80px 0 60px; }
-  .hero .badge { display: inline-block; background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); font-size: 13px; padding: 6px 16px; border-radius: 999px; margin-bottom: 24px; }
-  .hero h1 { font-size: 48px; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
-  .hero h1 .grad { background: linear-gradient(90deg, #3B82F6, #F59E0B); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .hero p { color: #94A3B8; font-size: 18px; max-width: 640px; margin: 0 auto 32px; }
-  .cta { display: inline-flex; gap: 12px; align-items: center; }
-  .btn { padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: 700; text-decoration: none; transition: all 200ms; }
-  .btn-primary { background: #3B82F6; color: white; }
-  .btn-primary:hover { background: #2563EB; }
-  .btn-ghost { background: transparent; color: #94A3B8; border: 1px solid #334155; }
-  .btn-ghost:hover { border-color: #64748B; color: #E2E8F0; }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 60px 0; }
-  .stat { background: #111B31; border: 1px solid #1E293B; border-radius: 16px; padding: 24px; text-align: center; }
-  .stat .num { font-size: 32px; font-weight: 800; color: #F59E0B; }
-  .stat .lbl { color: #94A3B8; font-size: 14px; margin-top: 4px; }
-  h2 { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 12px; }
-  .sub { text-align: center; color: #94A3B8; margin-bottom: 48px; }
-  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 80px; }
-  .feature { background: #111B31; border: 1px solid #1E293B; border-radius: 16px; padding: 28px; }
-  .feature .icon { font-size: 28px; margin-bottom: 12px; }
-  .feature h3 { font-size: 18px; margin-bottom: 8px; }
-  .feature p { color: #94A3B8; font-size: 14px; }
-  .pricing { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 760px; margin: 0 auto 80px; }
-  .plan { background: #111B31; border: 1px solid #1E293B; border-radius: 20px; padding: 32px; position: relative; }
-  .plan.pro { border-color: #F59E0B; }
-  .plan .tag { position: absolute; top: -14px; right: 24px; font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 999px; }
-  .plan.lite .tag { background: #334155; color: #94A3B8; }
-  .plan.pro .tag { background: #F59E0B; color: #0B1120; }
-  .plan .name { font-size: 16px; color: #94A3B8; margin-bottom: 8px; }
-  .plan .price { font-size: 40px; font-weight: 800; margin-bottom: 16px; }
-  .plan .price small { font-size: 16px; color: #64748B; font-weight: 400; }
-  .plan ul { list-style: none; margin-bottom: 24px; }
-  .plan li { font-size: 14px; color: #CBD5E1; padding: 6px 0; }
-  .plan li::before { content: '✓ '; color: #4ADE80; font-weight: 700; }
-  .plan .btn { width: 100%; text-align: center; }
-  footer { border-top: 1px solid #1E293B; padding: 32px 0; text-align: center; color: #64748B; font-size: 13px; }
-  @media (max-width: 768px) {
-    .hero h1 { font-size: 32px; }
-    .stats, .features, .pricing { grid-template-columns: 1fr; }
-    nav a { margin-left: 12px; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: 'Inter', sans-serif; background: #000; color: #fff; -webkit-font-smoothing: antialiased; }
+
+  /* ===== Background video ===== */
+  .bg-video {
+    position: fixed; inset: 0; z-index: 0;
+    width: 100%; height: 100%; object-fit: cover;
   }
+
+  /* ===== Bottom blur overlay (no dark gradient) ===== */
+  .blur-overlay {
+    position: fixed; inset: 0; z-index: 1;
+    pointer-events: none;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 45%);
+    mask-image: linear-gradient(to top, black 0%, transparent 45%);
+  }
+
+  /* ===== Liquid glass ===== */
+  .liquid-glass {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.01);
+    background-blend-mode: luminosity;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: none;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  }
+  .liquid-glass::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.45) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .liquid-glass:hover { background: rgba(255, 255, 255, 0.06); }
+
+  /* ===== Blur fade up ===== */
+  @keyframes blurFadeUp {
+    from { opacity: 0; filter: blur(20px); transform: translateY(40px); }
+    to   { opacity: 1; filter: blur(0); transform: translateY(0); }
+  }
+  .animate-blur-fade-up {
+    opacity: 0;
+    animation: blurFadeUp 1s ease-out forwards;
+  }
+
+  /* ===== Navbar ===== */
+  .nav {
+    position: relative; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1rem; padding: 1.25rem 1.5rem;
+  }
+  @media (min-width: 768px) { .nav { padding: 1.5rem 3rem; } }
+  @media (min-width: 1024px) { .nav { padding: 1.5rem 3rem; } }
+
+  .logo {
+    height: 2rem; line-height: 2rem;
+    font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .logo .mark { width: 2rem; height: 2rem; border-radius: 50%; background: #fff; color: #000; display: grid; place-items: center; font-size: 1.05rem; font-weight: 700; }
+  @media (min-width: 768px) { .logo { height: 2.5rem; line-height: 2.5rem; font-size: 1.75rem; } .logo .mark { width: 2.5rem; height: 2.5rem; font-size: 1.3rem; } }
+
+  .nav-links { display: none; align-items: center; gap: 2rem; }
+  @media (min-width: 1024px) { .nav-links { display: flex; } }
+  .nav-links a { font-size: 0.875rem; color: rgba(255,255,255,0.85); transition: color 0.3s; }
+  .nav-links a:hover { color: #d1d5db; }
+
+  .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+
+  .btn-search {
+    display: none; align-items: center; gap: 0.5rem;
+    border-radius: 9999px; color: #fff;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: background 0.3s;
+  }
+  @media (min-width: 640px) { .btn-search { display: inline-flex; } }
+  @media (min-width: 768px) { .btn-search { padding: 0.5rem 1.5rem; } }
+
+  .btn-user {
+    display: none; align-items: center; justify-content: center;
+    width: 2.5rem; height: 2.5rem; border-radius: 9999px; color: #fff;
+    transition: background 0.3s;
+  }
+  @media (min-width: 640px) { .btn-user { display: grid; } }
+
+  .btn-burger {
+    display: grid; place-items: center;
+    width: 2.5rem; height: 2.5rem; border-radius: 9999px; color: #fff;
+  }
+  @media (min-width: 1024px) { .btn-burger { display: none; } }
+  .btn-burger svg { grid-area: 1 / 1; transition: transform 0.5s ease-out, opacity 0.5s ease-out; }
+  .icon-menu { opacity: 1; }
+  .icon-close { opacity: 0; transform: rotate(180deg) scale(0.5); }
+  .btn-burger.open .icon-menu { opacity: 0; transform: rotate(-180deg) scale(0.5); }
+  .btn-burger.open .icon-close { opacity: 1; transform: rotate(0) scale(1); }
+
+  /* ===== Mobile menu ===== */
+  .mobile-menu {
+    position: absolute; top: 72px; left: 0; right: 0; z-index: 40;
+    background: rgba(17,17,17,0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid #1f2937; border-bottom: 1px solid #1f2937;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9);
+    padding: 0.75rem;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .mobile-menu.closed {
+    transform: translateY(-1rem);
+    opacity: 0; pointer-events: none;
+  }
+  @media (min-width: 1024px) { .mobile-menu { display: none; } }
+  .mobile-menu a {
+    display: block; padding: 0.75rem; border-radius: 0.5rem;
+    font-size: 0.9rem; color: #fff;
+    transition: background 0.3s;
+  }
+  .mobile-menu a:hover { background: rgba(31,41,55,0.5); }
+  .slide-item { opacity: 0; }
+  .mobile-menu.open .slide-item { animation: slideIn 0.5s ease-out forwards; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-1rem); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .mobile-menu .divider { border-top: 1px solid #1f2937; margin: 0.5rem 0; }
+  .mobile-menu .m-search-row { display: flex; gap: 0.75rem; padding: 0.5rem 0 0.25rem; }
+  @media (min-width: 640px) { .mobile-menu .m-search-row { display: none; } }
+  .m-glass {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    border-radius: 9999px; color: #fff; padding: 0.6rem 1rem; font-size: 0.875rem;
+  }
+  .m-glass.circle { flex: 0 0 auto; width: 2.5rem; height: 2.5rem; }
+
+  /* ===== Hero content ===== */
+  .hero {
+    position: relative;
+    height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .hero-body {
+    position: relative; z-index: 10;
+    flex: 1; display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 1rem 2rem;
+  }
+  @media (min-width: 640px) { .hero-body { padding: 0 1.5rem 2rem; } }
+  @media (min-width: 768px) { .hero-body { padding: 0 3rem 4rem; } }
+
+  .hero-inner { display: flex; flex-direction: column; align-items: flex-start; gap: 2rem; }
+  @media (min-width: 768px) { .hero-inner { flex-direction: row; align-items: flex-end; } }
+
+  .hero-left { flex: 1; min-width: 0; }
+
+  .meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.75rem;
+  }
+  @media (min-width: 640px) { .meta { font-size: 0.875rem; margin-bottom: 2rem; gap: 0.75rem 1.5rem; } }
+  .meta-item { display: flex; align-items: center; gap: 0.4rem; color: #fff; }
+  .meta-item.muted { color: rgba(255,255,255,0.6); }
+  .meta-item .lbl { font-weight: 500; }
+  .meta svg { flex: 0 0 auto; }
+  .star { fill: #fff; }
+
+  .title {
+    font-size: 1.875rem; line-height: 1.1;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+    text-wrap: balance;
+  }
+  @media (min-width: 640px) { .title { font-size: 3rem; } }
+  @media (min-width: 768px) { .title { font-size: 3.75rem; margin-bottom: 1.5rem; } }
+  @media (min-width: 1024px) { .title { font-size: 4.5rem; } }
+
+  .desc {
+    font-size: 1rem; color: #9ca3af;
+    margin-bottom: 1.5rem; max-width: 42rem;
+    text-wrap: pretty;
+  }
+  @media (min-width: 640px) { .desc { font-size: 1.125rem; } }
+  @media (min-width: 768px) { .desc { font-size: 1.25rem; margin-bottom: 3rem; } }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; }
+  .btn-watch {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #fff; color: #000;
+    border-radius: 9999px; border: none;
+    font-weight: 500; font-size: 0.95rem;
+    padding: 0.625rem 1.5rem;
+    transition: background 0.3s;
+  }
+  .btn-watch:hover { background: #e5e7eb; }
+  @media (min-width: 640px) { .btn-watch { padding: 0.75rem 2rem; } }
+  .btn-learn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    border-radius: 9999px; color: #fff;
+    font-weight: 500; font-size: 0.95rem;
+    padding: 0.625rem 1.5rem;
+  }
+  @media (min-width: 640px) { .btn-learn { padding: 0.75rem 2rem; } }
+
+  .hero-nav-arrows { display: flex; gap: 0.75rem; }
+  @media (min-width: 768px) { .hero-nav-arrows { flex-direction: row; } }
+  .btn-arrow {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 9999px; color: #fff;
+    padding: 0.625rem 1rem;
+    transition: background 0.3s;
+  }
+  @media (min-width: 640px) { .btn-arrow { padding: 0.75rem 1.5rem; } }
+  .btn-arrow .arr { display: flex; align-items: center; }
+
+  .zoom { transition: transform 0.3s ease; }
+  .btn-arrow:hover .zoom, .liquid-glass:hover .zoom { transform: scale(1.15); }
+
+  button { font-family: inherit; cursor: pointer; }
+  a { color: inherit; text-decoration: none; }
 </style>
 </head>
 <body>
-  <div class="container">
-    <nav>
-      <div class="logo">Biz<span>Flow</span></div>
-      <div>
-        <a href="#features">기능</a>
-        <a href="#pricing">요금제</a>
-      </div>
-    </nav>
 
-    <header class="hero">
-      <div class="badge">무료 인프라로 운영되는 중소기업 AI 자동화</div>
-      <h1>놓치는 문의와 예약,<br><span class="grad">AI가 24시간 잡아드립니다</span></h1>
-      <p>카카오톡 AI 응대 · 예약 자동화 · 경쟁사 모니터링. 비싼 솔루션 없이 구독 하나로 시작하세요.</p>
-      <div class="cta">
-        <a href="paypal-checkout.html" class="btn btn-primary">구독 시작하기</a>
-        <a href="#pricing" class="btn btn-ghost">요금제 보기</a>
-      </div>
-      <div class="stats">
-        <div class="stat"><div class="num">24h</div><div class="lbl">365일 AI 응대</div></div>
-        <div class="stat"><div class="num">0원</div><div class="lbl">인프라 비용</div></div>
-        <div class="stat"><div class="num">5분</div><div class="lbl">자동 설정</div></div>
-      </div>
-    </header>
+<video class="bg-video" autoplay muted loop playsinline poster=""
+  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260406_094145_4a271a6c-3869-4f1c-8aa7-aeb0cb227994.mp4"></video>
 
-    <h2 id="features">왜 BizFlow인가</h2>
-    <p class="sub">수작업으로 하던 일을 전부 자동화합니다</p>
-    <div class="features">
-      <div class="feature"><div class="icon">💬</div><h3>카톡 AI 응대</h3><p>고객 문의에 AI가 즉시 답변. 야간·주말에도 놓치지 않습니다.</p></div>
-      <div class="feature"><div class="icon">📅</div><h3>예약 자동화</h3><p>상담 예약 요청을 감지해 캘린더에 자동 등록하고 확정합니다.</p></div>
-      <div class="feature"><div class="icon">📊</div><h3>경쟁사 모니터링</h3><p>경쟁사 가격·신제품 변화를 매일 크롤링해 리포트로 알려드립니다.</p></div>
-      <div class="feature"><div class="icon">🔔</div><h3>실시간 알림</h3><p>예약·문의·가격변동을 텔레그램으로 즉시 받아보세요.</p></div>
-      <div class="feature"><div class="icon">💰</div><h3>무료 인프라</h3><p>GitHub Actions + Cloudflare로 서버비용 0원. 부담 없이 시작.</p></div>
-      <div class="feature"><div class="icon">🔒</div><h3>안전한 결제</h3><p>PayPal로 안전하게 결제, 구독 관리는 자동.</p></div>
+<div class="blur-overlay"></div>
+
+<div class="hero">
+  <nav class="nav">
+    <div class="logo animate-blur-fade-up" style="animation-delay:0ms">
+      <div class="mark">B</div>BIZFLOW
     </div>
 
-    <h2 id="pricing">요금제</h2>
-    <p class="sub">필요한 만큼만 선택하세요</p>
-    <div class="pricing">
-      <div class="plan lite">
-        <div class="tag">LITE</div>
-        <div class="name">BizFlow Lite</div>
-        <div class="price">$3<small> /월</small></div>
-        <ul>
-          <li>카톡 AI 응대 (최대 15분)</li>
-          <li>예약 요청 → 수동 확정</li>
-          <li>텔레그램 알림</li>
-          <li>경쟁사 3개 모니터링</li>
-          <li>일일 리포트</li>
-        </ul>
-        <a href="paypal-checkout.html?plan=lite" class="btn btn-ghost">Lite 시작</a>
-      </div>
-      <div class="plan pro">
-        <div class="tag">PRO</div>
-        <div class="name">BizFlow Pro</div>
-        <div class="price">$6<small> /월</small></div>
-        <ul>
-          <li>카톡 AI 즉시 응답</li>
-          <li>예약 자동 확정 (Cal.com)</li>
-          <li>실시간 알림 + 이메일</li>
-          <li>경쟁사 10개 모니터링</li>
-          <li>월간 전략 리포트</li>
-          <li>우선 지원</li>
-        </ul>
-        <a href="paypal-checkout.html?plan=pro" class="btn btn-primary">Pro 시작</a>
-      </div>
+    <div class="nav-links">
+      <a href="#movies" class="animate-blur-fade-up" style="animation-delay:100ms">매출</a>
+      <a href="#tv" class="animate-blur-fade-up" style="animation-delay:150ms">단골</a>
+      <a href="#pick" class="animate-blur-fade-up" style="animation-delay:200ms">자동화</a>
+      <a href="#interviews" class="animate-blur-fade-up" style="animation-delay:250ms">실행 로그</a>
+      <a href="#reviews" class="animate-blur-fade-up" style="animation-delay:300ms">비교</a>
+    </div>
+
+    <div class="nav-right">
+      <button class="btn-search liquid-glass animate-blur-fade-up" style="animation-delay:350ms" data-go>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Search
+      </button>
+      <button class="btn-user liquid-glass animate-blur-fade-up" style="animation-delay:400ms" data-go>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <button class="btn-burger liquid-glass animate-blur-fade-up" id="burger" style="animation-delay:350ms" aria-label="메뉴">
+        <svg class="icon-menu" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        <svg class="icon-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-menu closed" id="mobileMenu">
+    <a href="#movies" class="slide-item" style="animation-delay:0ms">매출</a>
+    <a href="#tv" class="slide-item" style="animation-delay:50ms">단골</a>
+    <a href="#pick" class="slide-item" style="animation-delay:100ms">자동화</a>
+    <a href="#interviews" class="slide-item" style="animation-delay:150ms">실행 로그</a>
+    <a href="#reviews" class="slide-item" style="animation-delay:200ms">비교</a>
+    <div class="divider slide-item" style="animation-delay:250ms"></div>
+    <div class="m-search-row slide-item" style="animation-delay:300ms">
+      <button class="m-glass liquid-glass" data-go>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Search
+      </button>
+      <button class="m-glass circle liquid-glass" data-go aria-label="프로필">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
     </div>
   </div>
 
-  <footer>
-    © 2026 BizFlow · 문의: hello@bizflow.example · <a href="paypal-checkout.html" style="color:#64748B;">결제</a>
-  </footer>
+  <div class="hero-body">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="meta">
+          <div class="meta-item animate-blur-fade-up" style="animation-delay:300ms">
+            <svg class="star" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <span class="lbl">4.9/5 매장주 평가</span>
+          </div>
+          <div class="meta-item muted animate-blur-fade-up" style="animation-delay:300ms">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>마감 5분/일</span>
+          </div>
+          <div class="meta-item muted animate-blur-fade-up" style="animation-delay:300ms">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>무료 체험 중</span>
+          </div>
+        </div>
+
+        <h1 class="title animate-blur-fade-up" style="animation-delay:400ms">
+          Step Through.<br>Work Smarter.
+        </h1>
+
+        <p class="desc animate-blur-fade-up" style="animation-delay:500ms">
+          바쁜 매장, 손이 부족한 가게. 매출 정리와 단골 챙기기를 한 화면에 모아, 반복 업무는 컴퓨터가 대신합니다.
+        </p>
+
+        <div class="cta-row">
+          <button class="btn-watch animate-blur-fade-up" style="animation-delay:600ms" data-go>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#000"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            무료 체험 시작
+          </button>
+          <button class="btn-learn liquid-glass animate-blur-fade-up" style="animation-delay:700ms" data-learn>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            데모 보기
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-nav-arrows">
+        <button class="btn-arrow liquid-glass animate-blur-fade-up" style="animation-delay:800ms" aria-label="이전" data-go>
+          <span class="arr"><svg class="zoom" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></span>
+        </button>
+        <button class="btn-arrow liquid-glass animate-blur-fade-up" style="animation-delay:900ms" aria-label="다음" data-go>
+          <span class="arr"><svg class="zoom" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="landing-anim.js"></script>
 </body>
 </html>
