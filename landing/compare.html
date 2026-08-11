@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비교 — BizFlow</title>
+<meta name="description" content="포스도, 장부도, 무료 CRM도 아닌 이유. 필요한 걸 한 곳에 모았습니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="page.css">
+</head>
+<body>
+<nav class="nav">
+  <a class="logo" href="index.html"><div class="mark">B</div>BIZFLOW</a>
+  <div class="nav-links">
+    <a href="sales.html">매출</a>
+    <a href="customers.html">단골</a>
+    <a href="automation.html">자동화</a>
+    <a href="logs.html">실행 로그</a>
+    <a href="compare.html" class="on">비교</a>
+  </div>
+  <button class="btn-burger" id="burger" aria-label="메뉴">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+  </button>
+</nav>
+<div class="mobile-menu closed" id="mobileMenu">
+  <a href="sales.html">매출</a>
+  <a href="customers.html">단골</a>
+  <a href="automation.html">자동화</a>
+  <a href="logs.html">실행 로그</a>
+  <a href="compare.html">비교</a>
+</div>
+
+<div class="wrap">
+  <div class="crumbs"><a href="index.html">홈</a> / 비교</div>
+  <div class="page-head">
+    <div class="kicker">비교</div>
+    <h1>포스도, 장부도, 무료 CRM도<br>아닌 이유</h1>
+    <p>결제는 토스플레이스, 정산은 캐시노트, 손님은 오루. 각각 잘하지만 셋을 돌려 쓰는 일이 없도록, 매장이 필요한 걸 한 곳에 모았습니다.</p>
+  </div>
+
+  <div class="card" style="overflow-x:auto">
+    <table style="min-width:760px">
+      <thead>
+        <tr><th>필요한 일</th><th class="us">BizFlow</th><th>토스플레이스</th><th>캐시노트</th><th>오루</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>매출 집계 화면</td><td class="us yes">✓</td><td class="yes">✓ 결제 연동 시</td><td class="yes">✓ 단말기 연동 시</td><td class="no">△</td></tr>
+        <tr><td>단골·거래 관리 통합</td><td class="us yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>자동화 워크플로 (무료 데모)</td><td class="us yes">✓ 원클릭</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>실행 로그로 자동화 확인</td><td class="us yes">✓</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>업종별 시작 템플릿</td><td class="us yes">✓ 20여 개</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>POS 결제 연동</td><td class="us no">준비 중</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">✕</td></tr>
+        <tr><td>요금</td><td class="us yes">체험 중 (무료)</td><td class="yes">기기+포스</td><td class="yes">무료~</td><td class="yes">평생 무료</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cta-box">
+    <h2>셋을 돌려 쓰지 마세요</h2>
+    <p>매출·단골·자동화를 한 곳에서, 무료 체험으로 확인해 보세요.</p>
+    <a class="btn" href="http://localhost:8787">무료 데모 체험하기 →</a>
+  </div>
+</div>
+
+<footer>© 2026 BizFlow. 매장 자동화를 처음 쓰시는 분을 위해 만들었습니다.</footer>
+<script src="page.js"></script>
+</body>
+</html>
