@@ -3,142 +3,349 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BizFlow — 카페·식당 자동 운영 시스템</title>
+<title>BizFlow — Step Through. Work Smarter.</title>
+<meta name="description" content="바쁜 매장, 손이 부족한 가게. 매출·단골·할 일을 한 화면에 모아 컴퓨터가 대신 정리합니다.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23fff'/%3E%3Ctext x='50' y='70' font-size='54' font-family='Inter,Arial' font-weight='700' text-anchor='middle' fill='%23000'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; color:#1a2332; background:#f6f8fb; line-height:1.6; }
-  .wrap { max-width:880px; margin:0 auto; padding:40px 20px 80px; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: 'Inter', sans-serif; background: #000; color: #fff; -webkit-font-smoothing: antialiased; }
 
-  h1 { font-size:38px; line-height:1.3; letter-spacing:-1px; }
-  h2 { font-size:24px; margin:0 0 8px; }
-  h3 { font-size:17px; margin:0 0 6px; }
-  .sub { font-size:18px; color:#5a6b82; margin-top:12px; }
+  /* ===== Background video ===== */
+  .bg-video {
+    position: fixed; inset: 0; z-index: 0;
+    width: 100%; height: 100%; object-fit: cover;
+  }
 
-  .hero { background:linear-gradient(135deg,#0f2a4a 0%,#1d4e89 100%); color:#fff; border-radius:20px; padding:48px 40px; margin-bottom:36px; }
-  .hero h1 { font-size:34px; }
-  .hero .sub { color:#cfe0f2; }
-  .badges { display:flex; gap:8px; flex-wrap:wrap; margin-top:20px; }
-  .badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); padding:6px 14px; border-radius:20px; font-size:13px; }
+  /* ===== Bottom blur overlay (no dark gradient) ===== */
+  .blur-overlay {
+    position: fixed; inset: 0; z-index: 1;
+    pointer-events: none;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 45%);
+    mask-image: linear-gradient(to top, black 0%, transparent 45%);
+  }
 
-  .card { background:#fff; border-radius:16px; padding:28px; margin-bottom:24px; box-shadow:0 2px 12px rgba(16,42,74,.06); }
-  .muted { color:#5a6b82; font-size:14px; }
+  /* ===== Liquid glass ===== */
+  .liquid-glass {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.01);
+    background-blend-mode: luminosity;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: none;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  }
+  .liquid-glass::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.45) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .liquid-glass:hover { background: rgba(255, 255, 255, 0.06); }
 
-  table { width:100%; border-collapse:collapse; margin-top:16px; font-size:15px; }
-  th, td { text-align:left; padding:12px 14px; border-bottom:1px solid #eef1f6; vertical-align:top; }
-  th { background:#f4f7fb; font-weight:700; }
-  .no { color:#d63a3a; font-weight:700; }
-  .yes { color:#0a7d3c; font-weight:700; }
+  /* ===== Blur fade up ===== */
+  @keyframes blurFadeUp {
+    from { opacity: 0; filter: blur(20px); transform: translateY(40px); }
+    to   { opacity: 1; filter: blur(0); transform: translateY(0); }
+  }
+  .animate-blur-fade-up {
+    opacity: 0;
+    animation: blurFadeUp 1s ease-out forwards;
+  }
 
-  ul.features { list-style:none; margin-top:12px; }
-  ul.features li { padding:10px 0; border-bottom:1px dashed #e8ecf2; display:flex; gap:12px; align-items:flex-start; }
-  ul.features .ico { font-size:20px; flex-shrink:0; }
+  /* ===== Navbar ===== */
+  .nav {
+    position: relative; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1rem; padding: 1.25rem 1.5rem;
+  }
+  @media (min-width: 768px) { .nav { padding: 1.5rem 3rem; } }
+  @media (min-width: 1024px) { .nav { padding: 1.5rem 3rem; } }
 
-  .steps { display:flex; gap:14px; flex-wrap:wrap; margin-top:16px; }
-  .step { flex:1; min-width:200px; background:#f4f7fb; border-radius:12px; padding:18px; font-size:14px; }
-  .step b { display:block; margin-bottom:4px; font-size:16px; }
+  .logo {
+    height: 2rem; line-height: 2rem;
+    font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .logo .mark { width: 2rem; height: 2rem; border-radius: 50%; background: #fff; color: #000; display: grid; place-items: center; font-size: 1.05rem; font-weight: 700; }
+  @media (min-width: 768px) { .logo { height: 2.5rem; line-height: 2.5rem; font-size: 1.75rem; } .logo .mark { width: 2.5rem; height: 2.5rem; font-size: 1.3rem; } }
 
-  .plan { display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; }
-  .plan-card { flex:1; min-width:220px; border:2px solid #e3e9f2; border-radius:14px; padding:22px; }
-  .plan-card.hot { border-color:#f2a21b; background:#fffbf2; }
-  .plan-card .price { font-size:28px; font-weight:700; margin:6px 0; }
-  .plan-card ul { list-style:none; font-size:14px; color:#44536a; margin-top:8px; }
-  .plan-card ul li { padding:3px 0; }
+  .nav-links { display: none; align-items: center; gap: 2rem; }
+  @media (min-width: 1024px) { .nav-links { display: flex; } }
+  .nav-links a { font-size: 0.875rem; color: rgba(255,255,255,0.85); transition: color 0.3s; }
+  .nav-links a:hover { color: #d1d5db; }
 
-  .cta { text-align:center; background:#fff; border-radius:16px; padding:40px; margin-top:8px; box-shadow:0 2px 12px rgba(16,42,74,.06); }
-  .cta p { font-size:20px; font-weight:700; margin-bottom:8px; }
-  .small { color:#5a6b82; font-size:13px; }
-  code { background:#eef1f6; padding:2px 6px; border-radius:4px; font-size:13px; }
+  .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+
+  .btn-search {
+    display: none; align-items: center; gap: 0.5rem;
+    border-radius: 9999px; color: #fff;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: background 0.3s;
+  }
+  @media (min-width: 640px) { .btn-search { display: inline-flex; } }
+  @media (min-width: 768px) { .btn-search { padding: 0.5rem 1.5rem; } }
+
+  .btn-user {
+    display: none; align-items: center; justify-content: center;
+    width: 2.5rem; height: 2.5rem; border-radius: 9999px; color: #fff;
+    transition: background 0.3s;
+  }
+  @media (min-width: 640px) { .btn-user { display: grid; } }
+
+  .btn-burger {
+    display: grid; place-items: center;
+    width: 2.5rem; height: 2.5rem; border-radius: 9999px; color: #fff;
+  }
+  @media (min-width: 1024px) { .btn-burger { display: none; } }
+  .btn-burger svg { grid-area: 1 / 1; transition: transform 0.5s ease-out, opacity 0.5s ease-out; }
+  .icon-menu { opacity: 1; }
+  .icon-close { opacity: 0; transform: rotate(180deg) scale(0.5); }
+  .btn-burger.open .icon-menu { opacity: 0; transform: rotate(-180deg) scale(0.5); }
+  .btn-burger.open .icon-close { opacity: 1; transform: rotate(0) scale(1); }
+
+  /* ===== Mobile menu ===== */
+  .mobile-menu {
+    position: absolute; top: 72px; left: 0; right: 0; z-index: 40;
+    background: rgba(17,17,17,0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid #1f2937; border-bottom: 1px solid #1f2937;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9);
+    padding: 0.75rem;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .mobile-menu.closed {
+    transform: translateY(-1rem);
+    opacity: 0; pointer-events: none;
+  }
+  @media (min-width: 1024px) { .mobile-menu { display: none; } }
+  .mobile-menu a {
+    display: block; padding: 0.75rem; border-radius: 0.5rem;
+    font-size: 0.9rem; color: #fff;
+    transition: background 0.3s;
+  }
+  .mobile-menu a:hover { background: rgba(31,41,55,0.5); }
+  .slide-item { opacity: 0; }
+  .mobile-menu.open .slide-item { animation: slideIn 0.5s ease-out forwards; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-1rem); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .mobile-menu .divider { border-top: 1px solid #1f2937; margin: 0.5rem 0; }
+  .mobile-menu .m-search-row { display: flex; gap: 0.75rem; padding: 0.5rem 0 0.25rem; }
+  @media (min-width: 640px) { .mobile-menu .m-search-row { display: none; } }
+  .m-glass {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    border-radius: 9999px; color: #fff; padding: 0.6rem 1rem; font-size: 0.875rem;
+  }
+  .m-glass.circle { flex: 0 0 auto; width: 2.5rem; height: 2.5rem; }
+
+  /* ===== Hero content ===== */
+  .hero {
+    position: relative;
+    height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .hero-body {
+    position: relative; z-index: 10;
+    flex: 1; display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 1rem 2rem;
+  }
+  @media (min-width: 640px) { .hero-body { padding: 0 1.5rem 2rem; } }
+  @media (min-width: 768px) { .hero-body { padding: 0 3rem 4rem; } }
+
+  .hero-inner { display: flex; flex-direction: column; align-items: flex-start; gap: 2rem; }
+  @media (min-width: 768px) { .hero-inner { flex-direction: row; align-items: flex-end; } }
+
+  .hero-left { flex: 1; min-width: 0; }
+
+  .meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.75rem;
+  }
+  @media (min-width: 640px) { .meta { font-size: 0.875rem; margin-bottom: 2rem; gap: 0.75rem 1.5rem; } }
+  .meta-item { display: flex; align-items: center; gap: 0.4rem; color: #fff; }
+  .meta-item.muted { color: rgba(255,255,255,0.6); }
+  .meta-item .lbl { font-weight: 500; }
+  .meta svg { flex: 0 0 auto; }
+  .star { fill: #fff; }
+
+  .title {
+    font-size: 1.875rem; line-height: 1.1;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+    text-wrap: balance;
+  }
+  @media (min-width: 640px) { .title { font-size: 3rem; } }
+  @media (min-width: 768px) { .title { font-size: 3.75rem; margin-bottom: 1.5rem; } }
+  @media (min-width: 1024px) { .title { font-size: 4.5rem; } }
+
+  .desc {
+    font-size: 1rem; color: #9ca3af;
+    margin-bottom: 1.5rem; max-width: 42rem;
+    text-wrap: pretty;
+  }
+  @media (min-width: 640px) { .desc { font-size: 1.125rem; } }
+  @media (min-width: 768px) { .desc { font-size: 1.25rem; margin-bottom: 3rem; } }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; }
+  .btn-watch {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #fff; color: #000;
+    border-radius: 9999px; border: none;
+    font-weight: 500; font-size: 0.95rem;
+    padding: 0.625rem 1.5rem;
+    transition: background 0.3s;
+  }
+  .btn-watch:hover { background: #e5e7eb; }
+  @media (min-width: 640px) { .btn-watch { padding: 0.75rem 2rem; } }
+  .btn-learn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    border-radius: 9999px; color: #fff;
+    font-weight: 500; font-size: 0.95rem;
+    padding: 0.625rem 1.5rem;
+  }
+  @media (min-width: 640px) { .btn-learn { padding: 0.75rem 2rem; } }
+
+  .hero-nav-arrows { display: flex; gap: 0.75rem; }
+  @media (min-width: 768px) { .hero-nav-arrows { flex-direction: row; } }
+  .btn-arrow {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 9999px; color: #fff;
+    padding: 0.625rem 1rem;
+    transition: background 0.3s;
+  }
+  @media (min-width: 640px) { .btn-arrow { padding: 0.75rem 1.5rem; } }
+  .btn-arrow .arr { display: flex; align-items: center; }
+
+  .zoom { transition: transform 0.3s ease; }
+  .btn-arrow:hover .zoom, .liquid-glass:hover .zoom { transform: scale(1.15); }
+
+  button { font-family: inherit; cursor: pointer; }
+  a { color: inherit; text-decoration: none; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="hero">
-    <h1>BizFlow — 카페·식당 자동 운영 시스템</h1>
-    <div class="sub">매출 정리, 재고 세기, 단골 쿠폰, 직원 출근, 장비 점검.<br>사장님이 손수 하던 일을 전부 자동화합니다.</div>
-    <div class="badges">
-      <span class="badge">매일 저녁 자동 매출 리포트</span>
-      <span class="badge">재고 부족 알림</span>
-      <span class="badge">단골 쿠폰·생일 자동 발송</span>
-      <span class="badge">직원 출근 알림</span>
-      <span class="badge">장비 관리</span>
-      <span class="badge">한국어 · 영어 · 일본어</span>
+<video class="bg-video" autoplay muted loop playsinline poster=""
+  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260406_094145_4a271a6c-3869-4f1c-8aa7-aeb0cb227994.mp4"></video>
+
+<div class="blur-overlay"></div>
+
+<div class="hero">
+  <nav class="nav">
+    <div class="logo animate-blur-fade-up" style="animation-delay:0ms">
+      <div class="mark">B</div>BIZFLOW
+    </div>
+
+    <div class="nav-links">
+      <a href="#movies" class="animate-blur-fade-up" style="animation-delay:100ms">매출</a>
+      <a href="#tv" class="animate-blur-fade-up" style="animation-delay:150ms">단골</a>
+      <a href="#pick" class="animate-blur-fade-up" style="animation-delay:200ms">자동화</a>
+      <a href="#interviews" class="animate-blur-fade-up" style="animation-delay:250ms">실행 로그</a>
+      <a href="#reviews" class="animate-blur-fade-up" style="animation-delay:300ms">비교</a>
+    </div>
+
+    <div class="nav-right">
+      <button class="btn-search liquid-glass animate-blur-fade-up" style="animation-delay:350ms" data-go>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Search
+      </button>
+      <button class="btn-user liquid-glass animate-blur-fade-up" style="animation-delay:400ms" data-go>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <button class="btn-burger liquid-glass animate-blur-fade-up" id="burger" style="animation-delay:350ms" aria-label="메뉴">
+        <svg class="icon-menu" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        <svg class="icon-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-menu closed" id="mobileMenu">
+    <a href="#movies" class="slide-item" style="animation-delay:0ms">매출</a>
+    <a href="#tv" class="slide-item" style="animation-delay:50ms">단골</a>
+    <a href="#pick" class="slide-item" style="animation-delay:100ms">자동화</a>
+    <a href="#interviews" class="slide-item" style="animation-delay:150ms">실행 로그</a>
+    <a href="#reviews" class="slide-item" style="animation-delay:200ms">비교</a>
+    <div class="divider slide-item" style="animation-delay:250ms"></div>
+    <div class="m-search-row slide-item" style="animation-delay:300ms">
+      <button class="m-glass liquid-glass" data-go>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Search
+      </button>
+      <button class="m-glass circle liquid-glass" data-go aria-label="프로필">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
     </div>
   </div>
 
-  <div class="card">
-    <h2>사장님 요즘 이러고 계시죠?</h2>
-    <table>
-      <tr><th>매일 하고 계시는 일</th><th>시간/주</th><th>BizFlow 쓰면</th></tr>
-      <tr><td>엑셀이나 수첩에 매일 매출 정리</td><td>약 1시간</td><td class="yes">밤 11시 자동 리포트</td></tr>
-      <tr><td>주말에 한 주 매출 손으로 더해서 분석</td><td>약 2시간</td><td class="yes">주간 리포트 자동 작성</td></tr>
-      <tr><td>재고(원두·우유·시럽) 일일이 세기</td><td>매일 10분</td><td class="yes">"발주 필요 5개" 자동 알림</td></tr>
-      <tr><td>단골 방문 횟수 / 생일 일일이 챙기기</td><td>수시</td><td class="yes">10번째 방문·생일 쿠폰 자동 발송</td></tr>
-      <tr><td>직원 출근했는지 카톡 확인</td><td>매일</td><td class="yes">직원에게 자동 출근 알림</td></tr>
-      <tr><td>에스프레소 머신 등 관리 (보통 까먹음)</td><td>수시</td><td class="yes">점검일 지나면 자동 경고</td></tr>
-    </table>
-  </div>
+  <div class="hero-body">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="meta">
+          <div class="meta-item animate-blur-fade-up" style="animation-delay:300ms">
+            <svg class="star" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+            <span class="lbl">4.9/5 매장주 평가</span>
+          </div>
+          <div class="meta-item muted animate-blur-fade-up" style="animation-delay:300ms">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>마감 5분/일</span>
+          </div>
+          <div class="meta-item muted animate-blur-fade-up" style="animation-delay:300ms">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>무료 체험 중</span>
+          </div>
+        </div>
 
-  <div class="card">
-    <h2>핵심은 하나: 워크플로 자동화</h2>
-    <p class="muted">자동화 탭에 가서 아래처럼 생긴 워크플로를 <b>켜기/끄기</b>만 하면 됩니다. 전부 자동 실행됩니다.</p>
-    <ul class="features">
-      <li><span class="ico">📊</span><span><b>일일 매출 자동 집계</b> — 매일 밤 "오늘 매출, 목표 달성률, 객단가" 정리</span></li>
-      <li><span class="ico">📈</span><span><b>주간 매출 리포트</b> — 일요일 밤 한 주 매출·최고 매출일·신장률 자동 리포트</span></li>
-      <li><span class="ico">📦</span><span><b>재고 발주 알림</b> — 재고가 임계값 아래면 "발주 필요" 알림</span></li>
-      <li><span class="ico">☕</span><span><b>단골 쿠폰·생일</b> — N번째 방문 시 쿠폰, 생일엔 자동 축하</span></li>
-      <li><span class="ico">👥</span><span><b>직원 출근 알림</b> — 스케줄 등록만 하면 출근 전 자동 안내</span></li>
-      <li><span class="ico">🔧</span><span><b>장비 점검 관리</b> — 점검 주기 지나면 "지연 3일" 경고</span></li>
-    </ul>
-  </div>
+        <h1 class="title animate-blur-fade-up" style="animation-delay:400ms">
+          Step Through.<br>Work Smarter.
+        </h1>
 
-  <div class="card">
-    <h2>업종에 맞는 버전을 골라 쓰세요</h2>
-    <p class="muted">카페·식당, 개인 매장·프랜차이즈에 따라 준비된 워크플로가 다릅니다.</p>
-    <div class="steps">
-      <div class="step"><b>☕ 개인 카페</b>매출 리포트 · 재고 발주<br>단골 쿠폰 · 출근 확인<br>장비 점검</div>
-      <div class="step"><b>🍚 개인 식당</b>테이블 회전율 · 메뉴 매출<br>식자재 재고 · 쿠폰</div>
-      <div class="step"><b>🏢 프랜차이즈 카페</b>지점별 매출 비교<br>KPI 달성 · 발주 집계</div>
-      <div class="step"><b>🏬 프랜차이즈 식당</b>지점별 실적 · 영업시간 관리<br>전집 균일 점검</div>
-    </div>
-  </div>
+        <p class="desc animate-blur-fade-up" style="animation-delay:500ms">
+          바쁜 매장, 손이 부족한 가게. 매출 정리와 단골 챙기기를 한 화면에 모아, 반복 업무는 컴퓨터가 대신합니다.
+        </p>
 
-  <div class="card">
-    <h2>얼마나 아낄 수 있나요?</h2>
-    <p class="muted">매주 약 3시간의 관리 시간 + 수많은 깜빡함을 아껴줍니다. 하루 20분이면 충분히 만져볼 수 있는 수준의 단순함입니다.</p>
-    <div class="steps">
-      <div class="step"><b>월 아끼는 시간</b>약 12시간 (직원 시급 1만원 기준 ✔약 12만원)</div>
-      <div class="step"><b>실수 절감</b>재고 소진 · 쿠폰 누락<br>청소 깜빡함</div>
-      <div class="step"><b>단골 유지</b>생일·리워드 챙김으로<br>재방문율 상승</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>요금 안내 (1점포 기준)</h2>
-    <div class="plan">
-      <div class="plan-card">
-        <h3>스타터</h3>
-        <div class="price">0원</div>
-        <ul><li>대시보드 · 매출 차트</li><li>워크플로 3개</li><li>한국어</li></ul>
+        <div class="cta-row">
+          <button class="btn-watch animate-blur-fade-up" style="animation-delay:600ms" data-go>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#000"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            무료 체험 시작
+          </button>
+          <button class="btn-learn liquid-glass animate-blur-fade-up" style="animation-delay:700ms" data-learn>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            데모 보기
+          </button>
+        </div>
       </div>
-      <div class="plan-card hot">
-        <h3>프로</h3>
-        <div class="price">월 19,000원</div>
-        <ul><li>전체 워크플로 무제한</li><li>카톡 리포트 (임시: 화면 / 알림 내역)</li><li>한국어 · 영어 · 일본어</li><li>업종별 템플릿 전체</li></ul>
-      </div>
-      <div class="plan-card">
-        <h3>프랜차이즈</h3>
-        <div class="price">월 49,000원</div>
-        <ul><li>지점별 대시보드</li><li>KPI · 발주 집계</li><li>전집 관리 화면</li></ul>
+
+      <div class="hero-nav-arrows">
+        <button class="btn-arrow liquid-glass animate-blur-fade-up" style="animation-delay:800ms" aria-label="이전" data-go>
+          <span class="arr"><svg class="zoom" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></span>
+        </button>
+        <button class="btn-arrow liquid-glass animate-blur-fade-up" style="animation-delay:900ms" aria-label="다음" data-go>
+          <span class="arr"><svg class="zoom" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+        </button>
       </div>
     </div>
   </div>
-
-  <div class="cta">
-    <p>지금 바로 체험해보세요</p>
-    <div class="small">테스트 로그인: <code>testuser12345@example.com</code> / <code>password123</code>  →  <b>자동화 탭</b>에서 <b>[카페 데모 시작]</b> 클릭</div>
-  </div>
-
 </div>
+
+<script src="landing-anim.js"></script>
 </body>
 </html>
