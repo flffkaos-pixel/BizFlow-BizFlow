@@ -1,0 +1,9 @@
+# BizFlow — Step Through. Work Smarter.
+
+> 바쁜 매장, 손이 부족한 가게. 매출·단골·할 일을 한 화면에 모아 컴퓨터가 대신 정리합니다.
+
+Canonical URL: https://bizflow-landing.vercel.app
+Language: ko
+
+## Pages
+- https://bizflow-landing.vercel.app/ : BizFlow — Step Through. Work Smarter.
